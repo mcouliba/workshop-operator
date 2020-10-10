@@ -1,0 +1,7 @@
+apiVersion: workshop.mcouliba.com/v1
+kind: Workshop
+metadata:
+  name: workshop-sample
+spec:
+  # Add fields here
+  foo: bar

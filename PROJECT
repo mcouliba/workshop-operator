@@ -1,0 +1,11 @@
+domain: mcouliba.com
+layout: go.kubebuilder.io/v2
+projectName: workshop-operator
+repo: github.com/mcouliba/workshop-operator
+resources:
+- group: workshop
+  kind: Workshop
+  version: v1
+version: 3-alpha
+plugins:
+  go.sdk.operatorframework.io/v2-alpha: {}

@@ -1,0 +1,20 @@
+# permissions for end users to view workshops.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: workshop-viewer-role
+rules:
+- apiGroups:
+  - workshop.mcouliba.com
+  resources:
+  - workshops
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - workshop.mcouliba.com
+  resources:
+  - workshops/status
+  verbs:
+  - get

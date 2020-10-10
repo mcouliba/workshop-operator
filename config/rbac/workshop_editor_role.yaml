@@ -1,0 +1,24 @@
+# permissions for end users to edit workshops.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: workshop-editor-role
+rules:
+- apiGroups:
+  - workshop.mcouliba.com
+  resources:
+  - workshops
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - workshop.mcouliba.com
+  resources:
+  - workshops/status
+  verbs:
+  - get
