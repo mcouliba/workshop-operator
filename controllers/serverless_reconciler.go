@@ -6,7 +6,8 @@ import (
 	workshopv1 "github.com/mcouliba/workshop-operator/api/v1"
 	"github.com/mcouliba/workshop-operator/deployment/kubernetes"
 	"github.com/mcouliba/workshop-operator/util"
-	"github.com/sirupsen/logrus"
+	"github.com/prometheus/common/log"
+
 	"k8s.io/apimachinery/pkg/api/errors"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
@@ -25,7 +26,7 @@ func (r *WorkshopReconciler) reconcileServerless(workshop *workshopv1.Workshop) 
 		if workshop.Status.Serverless != util.OperatorStatus.Installed {
 			workshop.Status.Serverless = util.OperatorStatus.Installed
 			if err := r.Status().Update(context.TODO(), workshop); err != nil {
-				logrus.Errorf("Failed to update Workshop status: %s", err)
+				log.Errorf("Failed to update Workshop status: %s", err)
 				return reconcile.Result{}, nil
 			}
 		}
@@ -43,14 +44,14 @@ func (r *WorkshopReconciler) addServerless(workshop *workshopv1.Workshop) (recon
 	if err := r.Create(context.TODO(), serverlessSubscription); err != nil && !errors.IsAlreadyExists(err) {
 		return reconcile.Result{}, err
 	} else if err == nil {
-		logrus.Infof("Created %s Subscription", serverlessSubscription.Name)
+		log.Infof("Created %s Subscription", serverlessSubscription.Name)
 	}
 
 	knativeServingNamespace := kubernetes.NewNamespace(workshop, r.Scheme, "knative-serving")
 	if err := r.Create(context.TODO(), knativeServingNamespace); err != nil && !errors.IsAlreadyExists(err) {
 		return reconcile.Result{}, err
 	} else if err == nil {
-		logrus.Infof("Created %s Namespace", knativeServingNamespace.Name)
+		log.Infof("Created %s Namespace", knativeServingNamespace.Name)
 	}
 
 	// TODO

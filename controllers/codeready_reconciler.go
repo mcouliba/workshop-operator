@@ -17,7 +17,8 @@ import (
 	"github.com/mcouliba/workshop-operator/deployment/codeready"
 	"github.com/mcouliba/workshop-operator/deployment/kubernetes"
 	"github.com/mcouliba/workshop-operator/util"
-	"github.com/sirupsen/logrus"
+	"github.com/prometheus/common/log"
+
 	"k8s.io/apimachinery/pkg/api/errors"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 	"sigs.k8s.io/yaml"
@@ -49,14 +50,14 @@ func (r *WorkshopReconciler) addCodeReadyWorkspace(workshop *workshopv1.Workshop
 	if err := r.Create(context.TODO(), codeReadyWorkspacesNamespace); err != nil && !errors.IsAlreadyExists(err) {
 		return reconcile.Result{}, err
 	} else if err == nil {
-		logrus.Infof("Created %s Project", codeReadyWorkspacesNamespace.Name)
+		log.Infof("Created %s Project", codeReadyWorkspacesNamespace.Name)
 	}
 
 	codeReadyWorkspacesOperatorGroup := kubernetes.NewOperatorGroup(workshop, r.Scheme, "codeready-workspaces", codeReadyWorkspacesNamespace.Name)
 	if err := r.Create(context.TODO(), codeReadyWorkspacesOperatorGroup); err != nil && !errors.IsAlreadyExists(err) {
 		return reconcile.Result{}, err
 	} else if err == nil {
-		logrus.Infof("Created %s OperatorGroup", codeReadyWorkspacesOperatorGroup.Name)
+		log.Infof("Created %s OperatorGroup", codeReadyWorkspacesOperatorGroup.Name)
 	}
 
 	codeReadyWorkspacesSubscription := kubernetes.NewRedHatSubscription(workshop, r.Scheme, "codeready-workspaces", codeReadyWorkspacesNamespace.Name,
@@ -64,12 +65,12 @@ func (r *WorkshopReconciler) addCodeReadyWorkspace(workshop *workshopv1.Workshop
 	if err := r.Create(context.TODO(), codeReadyWorkspacesSubscription); err != nil && !errors.IsAlreadyExists(err) {
 		return reconcile.Result{}, err
 	} else if err == nil {
-		logrus.Infof("Created %s Subscription", codeReadyWorkspacesSubscription.Name)
+		log.Infof("Created %s Subscription", codeReadyWorkspacesSubscription.Name)
 	}
 
 	// Approve the installation
 	if err := r.ApproveInstallPlan(clusterServiceVersion, "codeready-workspaces", codeReadyWorkspacesNamespace.Name); err != nil {
-		logrus.Warnf("Waiting for Subscription to create InstallPlan for %s", "codeready-workspaces")
+		log.Warnf("Waiting for Subscription to create InstallPlan for %s", "codeready-workspaces")
 		return reconcile.Result{}, err
 	}
 
@@ -82,7 +83,7 @@ func (r *WorkshopReconciler) addCodeReadyWorkspace(workshop *workshopv1.Workshop
 	if err := r.Create(context.TODO(), codeReadyWorkspacesCustomResource); err != nil && !errors.IsAlreadyExists(err) {
 		return reconcile.Result{}, err
 	} else if err == nil {
-		logrus.Infof("Created %s Custom Resource", codeReadyWorkspacesCustomResource.Name)
+		log.Infof("Created %s Custom Resource", codeReadyWorkspacesCustomResource.Name)
 	}
 
 	// Wait for CodeReadyWorkspace to be running
@@ -113,14 +114,14 @@ func (r *WorkshopReconciler) addCodeReadyWorkspace(workshop *workshopv1.Workshop
 		if err := r.Create(context.TODO(), cheClusterRole); err != nil && !errors.IsAlreadyExists(err) {
 			return reconcile.Result{}, err
 		} else if err == nil {
-			logrus.Infof("Created %s Cluster Role", cheClusterRole.Name)
+			log.Infof("Created %s Cluster Role", cheClusterRole.Name)
 		}
 
 		cheClusterRoleBinding := kubernetes.NewClusterRoleBindingSA(workshop, r.Scheme, "che", codeReadyWorkspacesNamespace.Name, labels, "che", cheClusterRole.Name, "ClusterRole")
 		if err := r.Create(context.TODO(), cheClusterRoleBinding); err != nil && !errors.IsAlreadyExists(err) {
 			return reconcile.Result{}, err
 		} else if err == nil {
-			logrus.Infof("Created %s Cluster Role Binding", cheClusterRoleBinding.Name)
+			log.Infof("Created %s Cluster Role Binding", cheClusterRoleBinding.Name)
 		}
 
 		for id := 1; id <= users; id++ {
@@ -189,25 +190,25 @@ func getDevFile(workshop *workshopv1.Workshop) (string, reconcile.Result, error)
 
 	httpResponse, err = client.Do(httpRequest)
 	if err != nil {
-		logrus.Errorf("Error when getting Devfile from %s", devfileRawURL)
+		log.Errorf("Error when getting Devfile from %s", devfileRawURL)
 		return "", reconcile.Result{}, err
 	}
 
 	if httpResponse.StatusCode == http.StatusOK {
 		bodyBytes, err := ioutil.ReadAll(httpResponse.Body)
 		if err != nil {
-			logrus.Errorf("Error when reading %s", devfileRawURL)
+			log.Errorf("Error when reading %s", devfileRawURL)
 			return "", reconcile.Result{}, err
 		}
 
 		bodyJSON, err := yaml.YAMLToJSON(bodyBytes)
 		if err != nil {
-			logrus.Errorf("Error to converting %s to JSON", devfileRawURL)
+			log.Errorf("Error to converting %s to JSON", devfileRawURL)
 			return "", reconcile.Result{}, err
 		}
 		devfile = string(bodyJSON)
 	} else {
-		logrus.Errorf("Error (%v) when getting Devfile from %s", httpResponse.StatusCode, devfileRawURL)
+		log.Errorf("Error (%v) when getting Devfile from %s", httpResponse.StatusCode, devfileRawURL)
 		return "", reconcile.Result{}, err
 	}
 
@@ -250,7 +251,7 @@ func createUser(workshop *workshopv1.Workshop, username string, codeflavor strin
 		return reconcile.Result{}, err
 	}
 	if httpResponse.StatusCode == http.StatusCreated {
-		logrus.Infof("Created %s in CodeReady Workspaces", username)
+		log.Infof("Created %s in CodeReady Workspaces", username)
 	}
 
 	return reconcile.Result{}, nil
@@ -287,17 +288,17 @@ func getUserToken(workshop *workshopv1.Workshop, username string, codeflavor str
 	httpRequest.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	httpResponse, err = client.Do(httpRequest)
 	if err != nil {
-		logrus.Errorf("Error to get the user access  token from %s keycloak (%v)", codeflavor, err)
+		log.Errorf("Error to get the user access  token from %s keycloak (%v)", codeflavor, err)
 		return "", reconcile.Result{}, err
 	}
 	defer httpResponse.Body.Close()
 	if httpResponse.StatusCode == http.StatusOK {
 		if err := json.NewDecoder(httpResponse.Body).Decode(&userToken); err != nil {
-			logrus.Errorf("Error to get the user access  token from %s keycloak (%v)", codeflavor, err)
+			log.Errorf("Error to get the user access  token from %s keycloak (%v)", codeflavor, err)
 			return "", reconcile.Result{}, err
 		}
 	} else {
-		logrus.Errorf("Error to get the user access token from %s keycloak (%d)", codeflavor, httpResponse.StatusCode)
+		log.Errorf("Error to get the user access token from %s keycloak (%d)", codeflavor, httpResponse.StatusCode)
 		return "", reconcile.Result{}, err
 	}
 
@@ -333,7 +334,7 @@ func getOAuthUserToken(workshop *workshopv1.Workshop, username string,
 
 	httpResponse, err = client.Do(httpRequest)
 	if err != nil {
-		logrus.Errorf("Error when getting Token Exchange for %s: %v", username, err)
+		log.Errorf("Error when getting Token Exchange for %s: %v", username, err)
 		return "", reconcile.Result{}, err
 	}
 
@@ -358,21 +359,21 @@ func getOAuthUserToken(workshop *workshopv1.Workshop, username string,
 		httpRequest.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 		httpResponse, err = client.Do(httpRequest)
 		if err != nil {
-			logrus.Errorf("Error to get the oauth user access  token from %s keycloak (%v)", codeflavor, err)
+			log.Errorf("Error to get the oauth user access  token from %s keycloak (%v)", codeflavor, err)
 			return "", reconcile.Result{}, err
 		}
 		defer httpResponse.Body.Close()
 		if httpResponse.StatusCode == http.StatusOK {
 			if err := json.NewDecoder(httpResponse.Body).Decode(&userToken); err != nil {
-				logrus.Errorf("Error to get the oauth user access  token from %s keycloak (%v)", codeflavor, err)
+				log.Errorf("Error to get the oauth user access  token from %s keycloak (%v)", codeflavor, err)
 				return "", reconcile.Result{}, err
 			}
 		} else {
-			logrus.Errorf("Error to get the oauth user access token from %s keycloak (%d)", codeflavor, httpResponse.StatusCode)
+			log.Errorf("Error to get the oauth user access token from %s keycloak (%d)", codeflavor, httpResponse.StatusCode)
 			return "", reconcile.Result{}, err
 		}
 	} else {
-		logrus.Errorf("Error when getting Token Exchange for %s (%d)", username, httpResponse.StatusCode)
+		log.Errorf("Error when getting Token Exchange for %s (%d)", username, httpResponse.StatusCode)
 		return "", reconcile.Result{}, err
 	}
 
@@ -444,17 +445,17 @@ func updateUserEmail(workshop *workshopv1.Workshop, username string,
 	httpRequest.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	httpResponse, err = client.Do(httpRequest)
 	if err != nil {
-		logrus.Errorf("Error when getting the master token from %s keycloak (%v)", codeflavor, err)
+		log.Errorf("Error when getting the master token from %s keycloak (%v)", codeflavor, err)
 		return reconcile.Result{}, err
 	}
 	defer httpResponse.Body.Close()
 	if httpResponse.StatusCode == http.StatusOK {
 		if err := json.NewDecoder(httpResponse.Body).Decode(&masterToken); err != nil {
-			logrus.Errorf("Error when reading the master token: %v", err)
+			log.Errorf("Error when reading the master token: %v", err)
 			return reconcile.Result{}, err
 		}
 	} else {
-		logrus.Errorf("Error when getting the master token from %s keycloak (%d)", codeflavor, httpResponse.StatusCode)
+		log.Errorf("Error when getting the master token from %s keycloak (%d)", codeflavor, httpResponse.StatusCode)
 		return reconcile.Result{}, err
 	}
 
@@ -464,14 +465,14 @@ func updateUserEmail(workshop *workshopv1.Workshop, username string,
 
 	httpResponse, err = client.Do(httpRequest)
 	if err != nil {
-		logrus.Errorf("Error when getting %s user: %v", username, err)
+		log.Errorf("Error when getting %s user: %v", username, err)
 		return reconcile.Result{}, err
 	}
 
 	defer httpResponse.Body.Close()
 	if httpResponse.StatusCode == http.StatusOK {
 		if err := json.NewDecoder(httpResponse.Body).Decode(&cheUser); err != nil {
-			logrus.Errorf("Error to get the user info (%v)", err)
+			log.Errorf("Error to get the user info (%v)", err)
 			return reconcile.Result{}, err
 		}
 
@@ -482,12 +483,12 @@ func updateUserEmail(workshop *workshopv1.Workshop, username string,
 			httpRequest.Header.Set("Authorization", "Bearer "+masterToken.AccessToken)
 			httpResponse, err = client.Do(httpRequest)
 			if err != nil {
-				logrus.Errorf("Error when update email address for %s: %v", username, err)
+				log.Errorf("Error when update email address for %s: %v", username, err)
 				return reconcile.Result{}, err
 			}
 		}
 	} else {
-		logrus.Errorf("Error when getting %s user: %v", username, httpResponse.StatusCode)
+		log.Errorf("Error when getting %s user: %v", username, httpResponse.StatusCode)
 		return reconcile.Result{}, err
 	}
 
@@ -523,7 +524,7 @@ func initWorkspace(workshop *workshopv1.Workshop, username string,
 
 	httpResponse, err = client.Do(httpRequest)
 	if err != nil {
-		logrus.Errorf("Error when creating the workspace for %s: %v", username, err)
+		log.Errorf("Error when creating the workspace for %s: %v", username, err)
 		return reconcile.Result{}, err
 	}
 	defer httpResponse.Body.Close()

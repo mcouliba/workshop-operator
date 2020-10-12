@@ -7,7 +7,7 @@ import "k8s.io/apimachinery/pkg/runtime"
 func (in *CertManager) DeepCopyInto(out *CertManager) {
 	out.TypeMeta = in.TypeMeta
 	out.ObjectMeta = in.ObjectMeta
-	out.Spec = CertManagerSpec{}
+	out.Spec = in.Spec
 }
 
 // DeepCopyObject returns a generically typed copy of an object

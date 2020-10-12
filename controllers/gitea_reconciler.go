@@ -14,7 +14,8 @@ import (
 	"github.com/mcouliba/workshop-operator/deployment/gitea"
 	"github.com/mcouliba/workshop-operator/deployment/kubernetes"
 	routev1 "github.com/openshift/api/route/v1"
-	"github.com/sirupsen/logrus"
+	"github.com/prometheus/common/log"
+
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
@@ -48,35 +49,35 @@ func (r *WorkshopReconciler) addGitea(workshop *workshopv1.Workshop, users int) 
 	if err := r.Create(context.TODO(), giteaNamespace); err != nil && !errors.IsAlreadyExists(err) {
 		return reconcile.Result{}, err
 	} else if err == nil {
-		logrus.Infof("Created %s Project", giteaNamespace.Name)
+		log.Infof("Created %s Project", giteaNamespace.Name)
 	}
 
 	giteaCustomResourceDefinition := kubernetes.NewCustomResourceDefinition(workshop, r.Scheme, "giteas.gpte.opentlc.com", "gpte.opentlc.com", "Gitea", "GiteaList", "giteas", "gitea", "v1alpha1", nil, nil)
 	if err := r.Create(context.TODO(), giteaCustomResourceDefinition); err != nil && !errors.IsAlreadyExists(err) {
 		return reconcile.Result{}, err
 	} else if err == nil {
-		logrus.Infof("Created %s Custom Resource Definition", giteaCustomResourceDefinition.Name)
+		log.Infof("Created %s Custom Resource Definition", giteaCustomResourceDefinition.Name)
 	}
 
 	giteaServiceAccount := kubernetes.NewServiceAccount(workshop, r.Scheme, "gitea-operator", giteaNamespace.Name, labels)
 	if err := r.Create(context.TODO(), giteaServiceAccount); err != nil && !errors.IsAlreadyExists(err) {
 		return reconcile.Result{}, err
 	} else if err == nil {
-		logrus.Infof("Created %s Service Account", giteaServiceAccount.Name)
+		log.Infof("Created %s Service Account", giteaServiceAccount.Name)
 	}
 
 	giteaClusterRole := kubernetes.NewClusterRole(workshop, r.Scheme, "gitea-operator", giteaNamespace.Name, labels, kubernetes.GiteaRules())
 	if err := r.Create(context.TODO(), giteaClusterRole); err != nil && !errors.IsAlreadyExists(err) {
 		return reconcile.Result{}, err
 	} else if err == nil {
-		logrus.Infof("Created %s Cluster Role", giteaClusterRole.Name)
+		log.Infof("Created %s Cluster Role", giteaClusterRole.Name)
 	}
 
 	giteaClusterRoleBinding := kubernetes.NewClusterRoleBindingSA(workshop, r.Scheme, "gitea-operator", giteaNamespace.Name, labels, "gitea-operator", "gitea-operator", "ClusterRole")
 	if err := r.Create(context.TODO(), giteaClusterRoleBinding); err != nil && !errors.IsAlreadyExists(err) {
 		return reconcile.Result{}, err
 	} else if err == nil {
-		logrus.Infof("Created %s Cluster Role Binding", giteaClusterRoleBinding.Name)
+		log.Infof("Created %s Cluster Role Binding", giteaClusterRoleBinding.Name)
 	}
 
 	giteaOperator := kubernetes.NewAnsibleOperatorDeployment(workshop, r.Scheme, "gitea-operator", giteaNamespace.Name, labels, imageName+":"+imageTag, "gitea-operator")
@@ -84,14 +85,14 @@ func (r *WorkshopReconciler) addGitea(workshop *workshopv1.Workshop, users int) 
 	if err := r.Create(context.TODO(), giteaOperator); err != nil && !errors.IsAlreadyExists(err) {
 		return reconcile.Result{}, err
 	} else if err == nil {
-		logrus.Infof("Created %s Operator", giteaOperator.Name)
+		log.Infof("Created %s Operator", giteaOperator.Name)
 	}
 
 	giteaCustomResource := gitea.NewCustomResource(workshop, r.Scheme, "gitea-server", giteaNamespace.Name, labels)
 	if err := r.Create(context.TODO(), giteaCustomResource); err != nil && !errors.IsAlreadyExists(err) {
 		return reconcile.Result{}, err
 	} else if err == nil {
-		logrus.Infof("Created %s Custom Resource", giteaCustomResource.Name)
+		log.Infof("Created %s Custom Resource", giteaCustomResource.Name)
 	}
 
 	// Wait for Server to be running
@@ -102,7 +103,7 @@ func (r *WorkshopReconciler) addGitea(workshop *workshopv1.Workshop, users int) 
 	// extract app route suffix from openshift-console
 	giteaRouteFound := &routev1.Route{}
 	if err := r.Get(context.TODO(), types.NamespacedName{Name: "gitea-server", Namespace: giteaNamespace.Name}, giteaRouteFound); err != nil {
-		logrus.Errorf("Failed to find %s route", "gitea-server")
+		log.Errorf("Failed to find %s route", "gitea-server")
 		return reconcile.Result{}, err
 	}
 
@@ -154,7 +155,7 @@ func createGitUser(workshop *workshopv1.Workshop, username string, giteaURL stri
 		return reconcile.Result{}, err
 	}
 	if httpResponse.StatusCode == http.StatusCreated {
-		logrus.Infof("Created %s user in Gitea", username)
+		log.Infof("Created %s user in Gitea", username)
 	}
 
 	defer httpResponse.Body.Close()

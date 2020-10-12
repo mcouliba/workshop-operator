@@ -8,7 +8,8 @@ import (
 	"github.com/mcouliba/workshop-operator/deployment/kubernetes"
 	"github.com/mcouliba/workshop-operator/util"
 	securityv1 "github.com/openshift/api/security/v1"
-	"github.com/sirupsen/logrus"
+	"github.com/prometheus/common/log"
+
 	rbac "k8s.io/api/rbac/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/types"
@@ -29,7 +30,7 @@ func (r *WorkshopReconciler) reconcileIstioWorkspace(workshop *workshopv1.Worksh
 		if workshop.Status.IstioWorkspace != util.OperatorStatus.Installed {
 			workshop.Status.IstioWorkspace = util.OperatorStatus.Installed
 			if err := r.Status().Update(context.TODO(), workshop); err != nil {
-				logrus.Errorf("Failed to update Workshop status: %s", err)
+				log.Errorf("Failed to update Workshop status: %s", err)
 				return reconcile.Result{}, err
 			}
 		}
@@ -52,35 +53,35 @@ func (r *WorkshopReconciler) addIstioWorkspace(workshop *workshopv1.Workshop, us
 	if err := r.Create(context.TODO(), customResourceDefinition); err != nil && !errors.IsAlreadyExists(err) {
 		return reconcile.Result{}, err
 	} else if err == nil {
-		logrus.Infof("Created %s Custom Resource Definition", customResourceDefinition.Name)
+		log.Infof("Created %s Custom Resource Definition", customResourceDefinition.Name)
 	}
 
 	serviceAccount := kubernetes.NewServiceAccount(workshop, r.Scheme, "istio-workspace", workshop.Namespace, labels)
 	if err := r.Create(context.TODO(), serviceAccount); err != nil && !errors.IsAlreadyExists(err) {
 		return reconcile.Result{}, err
 	} else if err == nil {
-		logrus.Infof("Created %s Service Account", serviceAccount.Name)
+		log.Infof("Created %s Service Account", serviceAccount.Name)
 	}
 
 	clusterRole := kubernetes.NewClusterRole(workshop, r.Scheme, "istio-workspace", workshop.Namespace, labels, kubernetes.IstioWorkspaceRules())
 	if err := r.Create(context.TODO(), clusterRole); err != nil && !errors.IsAlreadyExists(err) {
 		return reconcile.Result{}, err
 	} else if err == nil {
-		logrus.Infof("Created %s Cluster Role", clusterRole.Name)
+		log.Infof("Created %s Cluster Role", clusterRole.Name)
 	}
 
 	clusterRoleBinding := kubernetes.NewClusterRoleBindingSA(workshop, r.Scheme, "istio-workspace", workshop.Namespace, labels, "istio-workspace", "istio-workspace", "ClusterRole")
 	if err := r.Create(context.TODO(), clusterRoleBinding); err != nil && !errors.IsAlreadyExists(err) {
 		return reconcile.Result{}, err
 	} else if err == nil {
-		logrus.Infof("Created %s Cluster Role Binding", clusterRoleBinding.Name)
+		log.Infof("Created %s Cluster Role Binding", clusterRoleBinding.Name)
 	}
 
 	operator := kubernetes.NewOperatorDeployment(workshop, r.Scheme, "istio-workspace", workshop.Namespace, labels, imageName+":"+imageTag, "istio-workspace", 8383, []string{"ike"}, []string{"serve"}, nil, nil)
 	if err := r.Create(context.TODO(), operator); err != nil && !errors.IsAlreadyExists(err) {
 		return reconcile.Result{}, err
 	} else if err == nil {
-		logrus.Infof("Created %s Operator", operator.Name)
+		log.Infof("Created %s Operator", operator.Name)
 	}
 
 	for id := 1; id <= users; id++ {
@@ -92,7 +93,7 @@ func (r *WorkshopReconciler) addIstioWorkspace(workshop *workshopv1.Workshop, us
 		if err := r.Create(context.TODO(), role); err != nil && !errors.IsAlreadyExists(err) {
 			return reconcile.Result{}, err
 		} else if err == nil {
-			logrus.Infof("Created %s Role", role.Name)
+			log.Infof("Created %s Role", role.Name)
 		}
 
 		users := []rbac.Subject{
@@ -107,7 +108,7 @@ func (r *WorkshopReconciler) addIstioWorkspace(workshop *workshopv1.Workshop, us
 		if err := r.Create(context.TODO(), roleBinding); err != nil && !errors.IsAlreadyExists(err) {
 			return reconcile.Result{}, err
 		} else if err == nil {
-			logrus.Infof("Created %s Role Binding", roleBinding.Name)
+			log.Infof("Created %s Role Binding", roleBinding.Name)
 		}
 
 		// Create SCC
@@ -123,7 +124,7 @@ func (r *WorkshopReconciler) addIstioWorkspace(workshop *workshopv1.Workshop, us
 			if err := r.Update(context.TODO(), privilegedSCCFound); err != nil {
 				return reconcile.Result{}, err
 			} else if err == nil {
-				logrus.Infof("Updated %s SCC", privilegedSCCFound.Name)
+				log.Infof("Updated %s SCC", privilegedSCCFound.Name)
 			}
 		}
 
@@ -137,7 +138,7 @@ func (r *WorkshopReconciler) addIstioWorkspace(workshop *workshopv1.Workshop, us
 			if err := r.Update(context.TODO(), anyuidSCCFound); err != nil {
 				return reconcile.Result{}, err
 			} else if err == nil {
-				logrus.Infof("Updated %s SCC", anyuidSCCFound.Name)
+				log.Infof("Updated %s SCC", anyuidSCCFound.Name)
 			}
 		}
 

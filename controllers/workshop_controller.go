@@ -23,7 +23,7 @@ import (
 	"github.com/go-logr/logr"
 	routev1 "github.com/openshift/api/route/v1"
 	"github.com/prometheus/common/log"
-	"github.com/sirupsen/logrus"
+
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
@@ -111,7 +111,7 @@ func (r *WorkshopReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	// extract app route suffix from openshift-console
 	route := &routev1.Route{}
 	if err := r.Get(ctx, types.NamespacedName{Name: "console", Namespace: "openshift-console"}, route); err != nil {
-		logrus.Errorf("Failed to get OpenShift Console: %s", err)
+		log.Errorf("Failed to get OpenShift Console: %s", err)
 		return reconcile.Result{}, err
 	}
 	openshiftConsoleURL = "https://" + route.Spec.Host

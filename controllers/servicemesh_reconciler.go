@@ -10,7 +10,8 @@ import (
 	smcp "github.com/mcouliba/workshop-operator/deployment/maistra/servicemeshcontrolplane"
 	smmr "github.com/mcouliba/workshop-operator/deployment/maistra/servicemeshmemberroll"
 	"github.com/mcouliba/workshop-operator/util"
-	"github.com/sirupsen/logrus"
+	"github.com/prometheus/common/log"
+
 	rbac "k8s.io/api/rbac/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
@@ -43,7 +44,7 @@ func (r *WorkshopReconciler) reconcileServiceMesh(workshop *workshopv1.Workshop,
 		if workshop.Status.ServiceMesh != util.OperatorStatus.Installed {
 			workshop.Status.ServiceMesh = util.OperatorStatus.Installed
 			if err := r.Status().Update(context.TODO(), workshop); err != nil {
-				logrus.Errorf("Failed to update Workshop status: %s", err)
+				log.Errorf("Failed to update Workshop status: %s", err)
 				return reconcile.Result{}, nil
 			}
 		}
@@ -64,11 +65,11 @@ func (r *WorkshopReconciler) addServiceMesh(workshop *workshopv1.Workshop, users
 	if err := r.Create(context.TODO(), subscription); err != nil && !errors.IsAlreadyExists(err) {
 		return reconcile.Result{}, err
 	} else if err == nil {
-		logrus.Infof("Created %s Subscription", subscription.Name)
+		log.Infof("Created %s Subscription", subscription.Name)
 	}
 
 	if err := r.ApproveInstallPlan(clusterserviceversion, "servicemeshoperator", "openshift-operators"); err != nil {
-		logrus.Infof("Waiting for Subscription to create InstallPlan for %s", subscription.Name)
+		log.Infof("Waiting for Subscription to create InstallPlan for %s", subscription.Name)
 		return reconcile.Result{}, err
 	}
 
@@ -77,7 +78,7 @@ func (r *WorkshopReconciler) addServiceMesh(workshop *workshopv1.Workshop, users
 	if err := r.Create(context.TODO(), istioSystemNamespace); err != nil && !errors.IsAlreadyExists(err) {
 		return reconcile.Result{}, err
 	} else if err == nil {
-		logrus.Infof("Created %s Namespace", istioSystemNamespace.Name)
+		log.Infof("Created %s Namespace", istioSystemNamespace.Name)
 	}
 
 	istioMembers := []string{}
@@ -112,7 +113,7 @@ func (r *WorkshopReconciler) addServiceMesh(workshop *workshopv1.Workshop, users
 	if err := r.Create(context.TODO(), jaegerRole); err != nil && !errors.IsAlreadyExists(err) {
 		return reconcile.Result{}, err
 	} else if err == nil {
-		logrus.Infof("Created %s Role", jaegerRole.Name)
+		log.Infof("Created %s Role", jaegerRole.Name)
 	}
 
 	JaegerRoleBinding := kubernetes.NewRoleBindingUsers(workshop, r.Scheme,
@@ -120,7 +121,7 @@ func (r *WorkshopReconciler) addServiceMesh(workshop *workshopv1.Workshop, users
 	if err := r.Create(context.TODO(), JaegerRoleBinding); err != nil && !errors.IsAlreadyExists(err) {
 		return reconcile.Result{}, err
 	} else if err == nil {
-		logrus.Infof("Created %s Role Binding", JaegerRoleBinding.Name)
+		log.Infof("Created %s Role Binding", JaegerRoleBinding.Name)
 	}
 
 	meshUserRoleBinding := kubernetes.NewRoleBindingUsers(workshop, r.Scheme,
@@ -129,7 +130,7 @@ func (r *WorkshopReconciler) addServiceMesh(workshop *workshopv1.Workshop, users
 	if err := r.Create(context.TODO(), meshUserRoleBinding); err != nil && !errors.IsAlreadyExists(err) {
 		return reconcile.Result{}, err
 	} else if err == nil {
-		logrus.Infof("Created %s Role Binding", meshUserRoleBinding.Name)
+		log.Infof("Created %s Role Binding", meshUserRoleBinding.Name)
 	}
 
 	serviceMeshControlPlaneCR := smcp.NewServiceMeshControlPlaneCR(workshop, r.Scheme,
@@ -137,7 +138,7 @@ func (r *WorkshopReconciler) addServiceMesh(workshop *workshopv1.Workshop, users
 	if err := r.Create(context.TODO(), serviceMeshControlPlaneCR); err != nil && !errors.IsAlreadyExists(err) {
 		return reconcile.Result{Requeue: true, RequeueAfter: time.Second * 1}, err
 	} else if err == nil {
-		logrus.Infof("Created %s Custom Resource", serviceMeshControlPlaneCR.Name)
+		log.Infof("Created %s Custom Resource", serviceMeshControlPlaneCR.Name)
 	}
 
 	serviceMeshMemberRollCR := smmr.NewServiceMeshMemberRollCR(workshop, r.Scheme,
@@ -145,7 +146,7 @@ func (r *WorkshopReconciler) addServiceMesh(workshop *workshopv1.Workshop, users
 	if err := r.Create(context.TODO(), serviceMeshMemberRollCR); err != nil && !errors.IsAlreadyExists(err) {
 		return reconcile.Result{}, err
 	} else if err == nil {
-		logrus.Infof("Created %s Custom Resource", serviceMeshMemberRollCR.Name)
+		log.Infof("Created %s Custom Resource", serviceMeshMemberRollCR.Name)
 	}
 
 	//Success
@@ -161,7 +162,7 @@ func (r *WorkshopReconciler) addElasticSearchOperator(workshop *workshopv1.Works
 	if err := r.Create(context.TODO(), redhatOperatorsNamespace); err != nil && !errors.IsAlreadyExists(err) {
 		return reconcile.Result{}, err
 	} else if err == nil {
-		logrus.Infof("Created %s Namespace", redhatOperatorsNamespace.Name)
+		log.Infof("Created %s Namespace", redhatOperatorsNamespace.Name)
 	}
 
 	subscription := kubernetes.NewRedHatSubscription(workshop, r.Scheme, "elasticsearch-operator", "openshift-operators-redhat",
@@ -169,11 +170,11 @@ func (r *WorkshopReconciler) addElasticSearchOperator(workshop *workshopv1.Works
 	if err := r.Create(context.TODO(), subscription); err != nil && !errors.IsAlreadyExists(err) {
 		return reconcile.Result{}, err
 	} else if err == nil {
-		logrus.Infof("Created %s Subscription", subscription.Name)
+		log.Infof("Created %s Subscription", subscription.Name)
 	}
 
 	if err := r.ApproveInstallPlan(clusterserviceversion, "elasticsearch-operator", "openshift-operators-redhat"); err != nil {
-		logrus.Infof("Waiting for Subscription to create InstallPlan for %s", subscription.Name)
+		log.Infof("Waiting for Subscription to create InstallPlan for %s", subscription.Name)
 		return reconcile.Result{}, err
 	}
 
@@ -191,11 +192,11 @@ func (r *WorkshopReconciler) addJaegerOperator(workshop *workshopv1.Workshop) (r
 	if err := r.Create(context.TODO(), subscription); err != nil && !errors.IsAlreadyExists(err) {
 		return reconcile.Result{}, err
 	} else if err == nil {
-		logrus.Infof("Created %s Subscription", subscription.Name)
+		log.Infof("Created %s Subscription", subscription.Name)
 	}
 
 	if err := r.ApproveInstallPlan(clusterserviceversion, "jaeger-product", "openshift-operators"); err != nil {
-		logrus.Infof("Waiting for Subscription to create InstallPlan for %s", subscription.Name)
+		log.Infof("Waiting for Subscription to create InstallPlan for %s", subscription.Name)
 		return reconcile.Result{}, err
 	}
 
@@ -213,11 +214,11 @@ func (r *WorkshopReconciler) addKialiOperator(workshop *workshopv1.Workshop) (re
 	if err := r.Create(context.TODO(), subscription); err != nil && !errors.IsAlreadyExists(err) {
 		return reconcile.Result{}, err
 	} else if err == nil {
-		logrus.Infof("Created %s Subscription", subscription.Name)
+		log.Infof("Created %s Subscription", subscription.Name)
 	}
 
 	if err := r.ApproveInstallPlan(clusterserviceversion, "kiali-ossm", "openshift-operators"); err != nil {
-		logrus.Infof("Waiting for Subscription to create InstallPlan for %s", subscription.Name)
+		log.Infof("Waiting for Subscription to create InstallPlan for %s", subscription.Name)
 		return reconcile.Result{}, err
 	}
 

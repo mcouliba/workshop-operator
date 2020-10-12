@@ -10,7 +10,8 @@ import (
 	"github.com/mcouliba/workshop-operator/deployment/bookbag"
 	"github.com/mcouliba/workshop-operator/deployment/kubernetes"
 	routev1 "github.com/openshift/api/route/v1"
-	"github.com/sirupsen/logrus"
+	"github.com/prometheus/common/log"
+
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -63,7 +64,7 @@ func (r *WorkshopReconciler) addUpdateBookbag(workshop *workshopv1.Workshop, use
 	if err := r.Create(context.TODO(), namespace); err != nil && !errors.IsAlreadyExists(err) {
 		return reconcile.Result{}, err
 	} else if err == nil {
-		logrus.Infof("Created %s Project", namespace.Name)
+		log.Infof("Created %s Project", namespace.Name)
 	}
 
 	bookbagName := fmt.Sprintf("user%s-bookbag", userID)
@@ -83,14 +84,14 @@ func (r *WorkshopReconciler) addUpdateBookbag(workshop *workshopv1.Workshop, use
 	if err := r.Create(context.TODO(), envConfigMap); err != nil && !errors.IsAlreadyExists(err) {
 		return reconcile.Result{}, err
 	} else if err == nil {
-		logrus.Infof("Created %s ConfigMap", envConfigMap.Name)
+		log.Infof("Created %s ConfigMap", envConfigMap.Name)
 	}
 
 	varConfigMap := kubernetes.NewConfigMap(workshop, r.Scheme, bookbagName+"-vars", namespace.Name, labels, nil)
 	if err := r.Create(context.TODO(), varConfigMap); err != nil && !errors.IsAlreadyExists(err) {
 		return reconcile.Result{}, err
 	} else if err == nil {
-		logrus.Infof("Created %s ConfigMap", varConfigMap.Name)
+		log.Infof("Created %s ConfigMap", varConfigMap.Name)
 	}
 
 	// Create Service Account
@@ -98,7 +99,7 @@ func (r *WorkshopReconciler) addUpdateBookbag(workshop *workshopv1.Workshop, use
 	if err := r.Create(context.TODO(), serviceAccount); err != nil && !errors.IsAlreadyExists(err) {
 		return reconcile.Result{}, err
 	} else if err == nil {
-		logrus.Infof("Created %s Service Account", serviceAccount.Name)
+		log.Infof("Created %s Service Account", serviceAccount.Name)
 	}
 
 	// Create Role Binding
@@ -107,7 +108,7 @@ func (r *WorkshopReconciler) addUpdateBookbag(workshop *workshopv1.Workshop, use
 	if err := r.Create(context.TODO(), roleBinding); err != nil && !errors.IsAlreadyExists(err) {
 		return reconcile.Result{}, err
 	} else if err == nil {
-		logrus.Infof("Created %s Role Binding", roleBinding.Name)
+		log.Infof("Created %s Role Binding", roleBinding.Name)
 	}
 
 	// Deploy/Update Bookbag
@@ -115,7 +116,7 @@ func (r *WorkshopReconciler) addUpdateBookbag(workshop *workshopv1.Workshop, use
 	if err := r.Create(context.TODO(), dep); err != nil && !errors.IsAlreadyExists(err) {
 		return reconcile.Result{}, err
 	} else if err == nil {
-		logrus.Infof("Created %s Deployment", dep.Name)
+		log.Infof("Created %s Deployment", dep.Name)
 	} else if errors.IsAlreadyExists(err) {
 		deploymentFound := &appsv1.Deployment{}
 		if err := r.Get(context.TODO(), types.NamespacedName{Name: dep.Name, Namespace: namespace.Name}, deploymentFound); err != nil {
@@ -126,7 +127,7 @@ func (r *WorkshopReconciler) addUpdateBookbag(workshop *workshopv1.Workshop, use
 				if err := r.Update(context.TODO(), dep); err != nil {
 					return reconcile.Result{}, err
 				}
-				logrus.Infof("Updated %s Deployment", dep.Name)
+				log.Infof("Updated %s Deployment", dep.Name)
 			}
 		}
 	}
@@ -136,7 +137,7 @@ func (r *WorkshopReconciler) addUpdateBookbag(workshop *workshopv1.Workshop, use
 	if err := r.Create(context.TODO(), service); err != nil && !errors.IsAlreadyExists(err) {
 		return reconcile.Result{}, err
 	} else if err == nil {
-		logrus.Infof("Created %s Service", service.Name)
+		log.Infof("Created %s Service", service.Name)
 	}
 
 	// Create Route
@@ -144,7 +145,7 @@ func (r *WorkshopReconciler) addUpdateBookbag(workshop *workshopv1.Workshop, use
 	if err := r.Create(context.TODO(), route); err != nil && !errors.IsAlreadyExists(err) {
 		return reconcile.Result{}, err
 	} else if err == nil {
-		logrus.Infof("Created %s Route", route.Name)
+		log.Infof("Created %s Route", route.Name)
 	}
 
 	//Success
@@ -162,7 +163,7 @@ func (r *WorkshopReconciler) deleteBookbag(workshop *workshopv1.Workshop, userID
 		if err := r.Delete(context.TODO(), routeFound); err != nil {
 			return reconcile.Result{}, err
 		}
-		logrus.Infof("Deleted %s Route", routeFound.Name)
+		log.Infof("Deleted %s Route", routeFound.Name)
 	}
 
 	serviceFound := &corev1.Service{}
@@ -172,7 +173,7 @@ func (r *WorkshopReconciler) deleteBookbag(workshop *workshopv1.Workshop, userID
 		if err := r.Delete(context.TODO(), serviceFound); err != nil {
 			return reconcile.Result{}, err
 		}
-		logrus.Infof("Deleted %s Service", serviceFound.Name)
+		log.Infof("Deleted %s Service", serviceFound.Name)
 	}
 
 	depFound := &appsv1.Deployment{}
@@ -182,7 +183,7 @@ func (r *WorkshopReconciler) deleteBookbag(workshop *workshopv1.Workshop, userID
 		if err := r.Delete(context.TODO(), depFound); err != nil {
 			return reconcile.Result{}, err
 		}
-		logrus.Infof("Deleted %s Deployment", depFound.Name)
+		log.Infof("Deleted %s Deployment", depFound.Name)
 	}
 
 	serviceAccountFound := &corev1.ServiceAccount{}
@@ -192,7 +193,7 @@ func (r *WorkshopReconciler) deleteBookbag(workshop *workshopv1.Workshop, userID
 		if err := r.Delete(context.TODO(), serviceAccountFound); err != nil {
 			return reconcile.Result{}, err
 		}
-		logrus.Infof("Deleted %s Service Account", serviceAccountFound.Name)
+		log.Infof("Deleted %s Service Account", serviceAccountFound.Name)
 	}
 
 	//Success

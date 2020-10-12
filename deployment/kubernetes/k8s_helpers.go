@@ -6,7 +6,7 @@ import (
 	"io"
 
 	"github.com/prometheus/common/log"
-	"github.com/sirupsen/logrus"
+
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -31,13 +31,13 @@ type k8s struct {
 func GetK8Client() *k8s {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		logrus.Errorf(err.Error())
+		log.Errorf(err.Error())
 	}
 	client := k8s{}
 	client.clientset, err = kubernetes.NewForConfig(cfg)
 
 	if err != nil {
-		logrus.Errorf(err.Error())
+		log.Errorf(err.Error())
 		return nil
 	}
 	return &client
@@ -64,7 +64,7 @@ func (cl *k8s) GetDeploymentStatus(name string, namespace string) (scaled bool) 
 		FieldSelector:  fields.OneTermEqualSelector("metadata.name", name).String(),
 		TimeoutSeconds: &timeout,
 	}
-	watcher, err := api.Deployments(namespace).Watch(listOptions)
+	watcher, err := api.Deployments(namespace).Watch(context.TODO(), listOptions)
 	if err != nil {
 		log.Error(err, "An error occurred")
 	}
@@ -76,7 +76,7 @@ func (cl *k8s) GetDeploymentStatus(name string, namespace string) (scaled bool) 
 			log.Error(err, "Unexpected type")
 		}
 		// check before watching in case the deployment is already scaled to 1
-		deployment, err := cl.clientset.AppsV1().Deployments(namespace).Get(name, metav1.GetOptions{})
+		deployment, err := cl.clientset.AppsV1().Deployments(namespace).Get(context.TODO(), name, metav1.GetOptions{})
 		if err != nil {
 			log.Errorf("Failed to get %s deployment: %s", deployment.Name, err)
 			return false
@@ -97,7 +97,7 @@ func (cl *k8s) GetDeploymentStatus(name string, namespace string) (scaled bool) 
 			}
 		}
 	}
-	dc, _ := cl.clientset.AppsV1().Deployments(namespace).Get(name, metav1.GetOptions{})
+	dc, _ := cl.clientset.AppsV1().Deployments(namespace).Get(context.TODO(), name, metav1.GetOptions{})
 	if dc.Status.ReadyReplicas != 1 {
 		log.Errorf("Failed to verify a successful %s deployment", name)
 		eventList := cl.GetEvents(name, namespace).Items
@@ -122,7 +122,7 @@ func (cl *k8s) GetDeploymentStatus(name string, namespace string) (scaled bool) 
 // GetEvents returns a list of events filtered by involvedObject
 func (cl *k8s) GetEvents(deploymentName string, namespace string) (list *corev1.EventList) {
 	eventListOptions := metav1.ListOptions{FieldSelector: fields.OneTermEqualSelector("involvedObject.fieldPath", "spec.containers{"+deploymentName+"}").String()}
-	deploymentEvents, _ := cl.clientset.CoreV1().Events(namespace).List(eventListOptions)
+	deploymentEvents, _ := cl.clientset.CoreV1().Events(namespace).List(context.TODO(), eventListOptions)
 	return deploymentEvents
 }
 
@@ -130,7 +130,7 @@ func (cl *k8s) GetEvents(deploymentName string, namespace string) (list *corev1.
 func (cl *k8s) GetPodLogs(podName string, namespace string) {
 	var limitBytes int64 = 60000
 	req := cl.clientset.CoreV1().Pods(namespace).GetLogs(podName, &corev1.PodLogOptions{LimitBytes: &limitBytes})
-	readCloser, err := req.Stream()
+	readCloser, err := req.Stream(context.TODO())
 	if err != nil {
 		log.Errorf("Pod error log: %v", err)
 	} else {
@@ -147,7 +147,7 @@ func (cl *k8s) GetDeploymentPod(name string, namespace string, label string) (po
 		LabelSelector: label + "=" + name,
 	}
 
-	podList, _ := api.Pods(namespace).List(listOptions)
+	podList, _ := api.Pods(namespace).List(context.TODO(), listOptions)
 	podListItems := podList.Items
 	if len(podListItems) == 0 {
 		log.Errorf("Failed to find pod to exec into. List of pods: %v", podListItems)

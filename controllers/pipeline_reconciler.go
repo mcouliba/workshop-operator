@@ -5,7 +5,8 @@ import (
 
 	workshopv1 "github.com/mcouliba/workshop-operator/api/v1"
 	"github.com/mcouliba/workshop-operator/deployment/kubernetes"
-	"github.com/sirupsen/logrus"
+	"github.com/prometheus/common/log"
+
 	"k8s.io/apimachinery/pkg/api/errors"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
@@ -35,12 +36,12 @@ func (r *WorkshopReconciler) addPipeline(workshop *workshopv1.Workshop) (reconci
 	if err := r.Create(context.TODO(), pipelineSubscription); err != nil && !errors.IsAlreadyExists(err) {
 		return reconcile.Result{}, err
 	} else if err == nil {
-		logrus.Infof("Created %s Subscription", pipelineSubscription.Name)
+		log.Infof("Created %s Subscription", pipelineSubscription.Name)
 	}
 
 	// Approve the installation
 	if err := r.ApproveInstallPlan(clusterServiceVersion, name, "openshift-operators"); err != nil {
-		logrus.Infof("Waiting for Subscription to create InstallPlan for %s", name)
+		log.Infof("Waiting for Subscription to create InstallPlan for %s", name)
 		return reconcile.Result{}, err
 	}
 

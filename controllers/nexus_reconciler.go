@@ -6,7 +6,8 @@ import (
 	workshopv1 "github.com/mcouliba/workshop-operator/api/v1"
 	"github.com/mcouliba/workshop-operator/deployment/kubernetes"
 	nexus "github.com/mcouliba/workshop-operator/deployment/nexus"
-	"github.com/sirupsen/logrus"
+	"github.com/prometheus/common/log"
+
 	"k8s.io/apimachinery/pkg/api/errors"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
@@ -36,49 +37,49 @@ func (r *WorkshopReconciler) addNexus(workshop *workshopv1.Workshop) (reconcile.
 	if err := r.Create(context.TODO(), nexusNamespace); err != nil && !errors.IsAlreadyExists(err) {
 		return reconcile.Result{}, err
 	} else if err == nil {
-		logrus.Infof("Created %s Project", nexusNamespace.Name)
+		log.Infof("Created %s Project", nexusNamespace.Name)
 	}
 
 	nexusCustomResourceDefinition := kubernetes.NewCustomResourceDefinition(workshop, r.Scheme, "nexus.gpte.opentlc.com", "gpte.opentlc.com", "Nexus", "NexusList", "nexus", "nexus", "v1alpha1", nil, nil)
 	if err := r.Create(context.TODO(), nexusCustomResourceDefinition); err != nil && !errors.IsAlreadyExists(err) {
 		return reconcile.Result{}, err
 	} else if err == nil {
-		logrus.Infof("Created %s Custom Resource Definition", nexusCustomResourceDefinition.Name)
+		log.Infof("Created %s Custom Resource Definition", nexusCustomResourceDefinition.Name)
 	}
 
 	nexusServiceAccount := kubernetes.NewServiceAccount(workshop, r.Scheme, "nexus-operator", nexusNamespace.Name, labels)
 	if err := r.Create(context.TODO(), nexusServiceAccount); err != nil && !errors.IsAlreadyExists(err) {
 		return reconcile.Result{}, err
 	} else if err == nil {
-		logrus.Infof("Created %s Service Account", nexusServiceAccount.Name)
+		log.Infof("Created %s Service Account", nexusServiceAccount.Name)
 	}
 
 	nexusClusterRole := kubernetes.NewClusterRole(workshop, r.Scheme, "nexus-operator", nexusNamespace.Name, labels, nexus.NewRules())
 	if err := r.Create(context.TODO(), nexusClusterRole); err != nil && !errors.IsAlreadyExists(err) {
 		return reconcile.Result{}, err
 	} else if err == nil {
-		logrus.Infof("Created %s Cluster Role", nexusClusterRole.Name)
+		log.Infof("Created %s Cluster Role", nexusClusterRole.Name)
 	}
 
 	nexusClusterRoleBinding := kubernetes.NewClusterRoleBindingSA(workshop, r.Scheme, "nexus-operator", nexusNamespace.Name, labels, "nexus-operator", "nexus-operator", "ClusterRole")
 	if err := r.Create(context.TODO(), nexusClusterRoleBinding); err != nil && !errors.IsAlreadyExists(err) {
 		return reconcile.Result{}, err
 	} else if err == nil {
-		logrus.Infof("Created %s Cluster Role Binding", nexusClusterRoleBinding.Name)
+		log.Infof("Created %s Cluster Role Binding", nexusClusterRoleBinding.Name)
 	}
 
 	nexusOperator := kubernetes.NewAnsibleOperatorDeployment(workshop, r.Scheme, "nexus-operator", nexusNamespace.Name, labels, "quay.io/mcouliba/nexus-operator:v0.10", "nexus-operator")
 	if err := r.Create(context.TODO(), nexusOperator); err != nil && !errors.IsAlreadyExists(err) {
 		return reconcile.Result{}, err
 	} else if err == nil {
-		logrus.Infof("Created %s Operator", nexusOperator.Name)
+		log.Infof("Created %s Operator", nexusOperator.Name)
 	}
 
 	nexusCustomResource := nexus.NewCustomResource(workshop, r.Scheme, "nexus", nexusNamespace.Name, labels)
 	if err := r.Create(context.TODO(), nexusCustomResource); err != nil && !errors.IsAlreadyExists(err) {
 		return reconcile.Result{}, err
 	} else if err == nil {
-		logrus.Infof("Created %s Custom Resource", nexusCustomResource.Name)
+		log.Infof("Created %s Custom Resource", nexusCustomResource.Name)
 	}
 
 	//Success
