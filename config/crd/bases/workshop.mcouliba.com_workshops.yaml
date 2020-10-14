@@ -151,32 +151,6 @@ spec:
                   - enabled
                   - image
                   type: object
-                guide:
-                  description: GuideSpec ...
-                  properties:
-                    enabled:
-                      type: boolean
-                    gitRepositoryGuideContext:
-                      type: string
-                    gitRepositoryGuideFile:
-                      type: string
-                    gitRepositoryGuidePath:
-                      type: string
-                    gitRepositoryGuideReference:
-                      type: string
-                    gitRepositoryLabPath:
-                      type: string
-                    gitRepositoryLabReference:
-                      type: string
-                  required:
-                  - enabled
-                  - gitRepositoryGuideContext
-                  - gitRepositoryGuideFile
-                  - gitRepositoryGuidePath
-                  - gitRepositoryGuideReference
-                  - gitRepositoryLabPath
-                  - gitRepositoryLabReference
-                  type: object
                 istioWorkspace:
                   description: IstioWorkspaceSpec ...
                   properties:
@@ -379,8 +353,6 @@ spec:
               type: string
             gitea:
               type: string
-            guide:
-              type: string
             istioWorkspace:
               type: string
             nexus:
@@ -403,7 +375,6 @@ spec:
           - certManager
           - codeReadyWorkspace
           - gitea
-          - guide
           - istioWorkspace
           - nexus
           - pipeline

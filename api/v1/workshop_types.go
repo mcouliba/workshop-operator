@@ -52,7 +52,6 @@ type InfrastructureSpec struct {
 	CertManager        CertManagerSpec        `json:"certManager,omitempty"`
 	CodeReadyWorkspace CodeReadyWorkspaceSpec `json:"codeReadyWorkspace,omitempty"`
 	Gitea              GiteaSpec              `json:"gitea,omitempty"`
-	Guide              GuideSpec              `json:"guide,omitempty"`
 	IstioWorkspace     IstioWorkspaceSpec     `json:"istioWorkspace,omitempty"`
 	Nexus              NexusSpec              `json:"nexus,omitempty"`
 	Pipeline           PipelineSpec           `json:"pipeline,omitempty"`
@@ -118,17 +117,6 @@ type ServerlessSpec struct {
 	OperatorHub OperatorHubSpec `json:"operatorHub"`
 }
 
-// GuideSpec ...
-type GuideSpec struct {
-	Enabled                     bool   `json:"enabled"`
-	GitRepositoryLabPath        string `json:"gitRepositoryLabPath"`
-	GitRepositoryLabReference   string `json:"gitRepositoryLabReference"`
-	GitRepositoryGuidePath      string `json:"gitRepositoryGuidePath"`
-	GitRepositoryGuideReference string `json:"gitRepositoryGuideReference"`
-	GitRepositoryGuideContext   string `json:"gitRepositoryGuideContext"`
-	GitRepositoryGuideFile      string `json:"gitRepositoryGuideFile"`
-}
-
 // CodeReadyWorkspaceSpec ...
 type CodeReadyWorkspaceSpec struct {
 	Enabled             bool            `json:"enabled"`
@@ -172,7 +160,6 @@ type WorkshopStatus struct {
 	CertManager          string `json:"certManager"`
 	CodeReadyWorkspace   string `json:"codeReadyWorkspace"`
 	Gitea                string `json:"gitea"`
-	Guide                string `json:"guide"`
 	IstioWorkspace       string `json:"istioWorkspace"`
 	Nexus                string `json:"nexus"`
 	Pipeline             string `json:"pipeline"`
