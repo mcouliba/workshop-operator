@@ -18,17 +18,8 @@ func (r *WorkshopReconciler) reconcileServerless(workshop *workshopv1.Workshop) 
 
 	if enabledServerless {
 
-		if result, err := r.addServerless(workshop); err != nil {
+		if result, err := r.addServerless(workshop); util.IsRequeued(result, err) {
 			return result, err
-		}
-
-		// Installed
-		if workshop.Status.Serverless != util.OperatorStatus.Installed {
-			workshop.Status.Serverless = util.OperatorStatus.Installed
-			if err := r.Status().Update(context.TODO(), workshop); err != nil {
-				log.Errorf("Failed to update Workshop status: %s", err)
-				return reconcile.Result{}, nil
-			}
 		}
 	}
 

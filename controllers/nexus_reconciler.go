@@ -8,6 +8,7 @@ import (
 	nexus "github.com/mcouliba/workshop-operator/deployment/nexus"
 	"github.com/prometheus/common/log"
 
+	"github.com/mcouliba/workshop-operator/util"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
@@ -18,9 +19,10 @@ func (r *WorkshopReconciler) reconcileNexus(workshop *workshopv1.Workshop) (reco
 
 	if enabledNexus {
 
-		if result, err := r.addNexus(workshop); err != nil {
+		if result, err := r.addNexus(workshop); util.IsRequeued(result, err) {
 			return result, err
 		}
+
 	}
 
 	//Success

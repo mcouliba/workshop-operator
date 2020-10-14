@@ -24,29 +24,20 @@ func (r *WorkshopReconciler) reconcileServiceMesh(workshop *workshopv1.Workshop,
 
 	if enabledServiceMesh || enabledServerless {
 
-		if result, err := r.addElasticSearchOperator(workshop); err != nil {
+		if result, err := r.addElasticSearchOperator(workshop); util.IsRequeued(result, err) {
 			return result, err
 		}
 
-		if result, err := r.addJaegerOperator(workshop); err != nil {
+		if result, err := r.addJaegerOperator(workshop); util.IsRequeued(result, err) {
 			return result, err
 		}
 
-		if result, err := r.addKialiOperator(workshop); err != nil {
+		if result, err := r.addKialiOperator(workshop); util.IsRequeued(result, err) {
 			return result, err
 		}
 
-		if result, err := r.addServiceMesh(workshop, users); err != nil {
+		if result, err := r.addServiceMesh(workshop, users); util.IsRequeued(result, err) {
 			return result, err
-		}
-
-		// Installed
-		if workshop.Status.ServiceMesh != util.OperatorStatus.Installed {
-			workshop.Status.ServiceMesh = util.OperatorStatus.Installed
-			if err := r.Status().Update(context.TODO(), workshop); err != nil {
-				log.Errorf("Failed to update Workshop status: %s", err)
-				return reconcile.Result{}, nil
-			}
 		}
 	}
 

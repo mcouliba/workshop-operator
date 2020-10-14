@@ -128,94 +128,91 @@ func (r *WorkshopReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	//////////////////////////
 	// Portal
 	//////////////////////////
-	if result, err := r.reconcilePortal(workshop, users, appsHostnameSuffix, openshiftConsoleURL); err != nil {
+	if result, err := r.reconcilePortal(workshop, users, appsHostnameSuffix, openshiftConsoleURL); util.IsRequeued(result, err) {
 		return result, err
 	}
 
 	//////////////////////////
 	// Projects
 	//////////////////////////
-	if result, err := r.reconcileProject(workshop, users); err != nil {
+	if result, err := r.reconcileProject(workshop, users); util.IsRequeued(result, err) {
 		return result, err
 	}
 
 	//////////////////////////
 	// Bookbag
 	//////////////////////////
-	if result, err := r.reconcileBookbag(workshop, users, appsHostnameSuffix,
-		openshiftConsoleURL); err != nil {
+	if result, err := r.reconcileBookbag(workshop, users, appsHostnameSuffix, openshiftConsoleURL); util.IsRequeued(result, err) {
 		return result, err
 	}
 
 	//////////////////////////
 	// Nexus
 	//////////////////////////
-	if result, err := r.reconcileNexus(workshop); err != nil {
+	if result, err := r.reconcileNexus(workshop); util.IsRequeued(result, err) {
 		return result, err
 	}
 
 	//////////////////////////
 	// Pipeline
 	//////////////////////////
-	if result, err := r.reconcilePipeline(workshop); err != nil {
+	if result, err := r.reconcilePipeline(workshop); util.IsRequeued(result, err) {
 		return result, err
 	}
 
 	//////////////////////////
 	// Gitea
 	//////////////////////////
-	if result, err := r.reconcileGitea(workshop, users); err != nil {
+	if result, err := r.reconcileGitea(workshop, users); util.IsRequeued(result, err) {
 		return result, err
 	}
 
 	//////////////////////////
 	// Argo CD
 	//////////////////////////
-	if result, err := r.reconcileArgoCD(workshop, users, appsHostnameSuffix,
-		openshiftConsoleURL); err != nil {
+	if result, err := r.reconcileArgoCD(workshop, users, appsHostnameSuffix, openshiftConsoleURL); util.IsRequeued(result, err) {
 		return result, err
 	}
 
 	//////////////////////////
 	// CodeReadyWorkspace
 	//////////////////////////
-	if result, err := r.reconcileCodeReadyWorkspace(workshop, users, appsHostnameSuffix,
-		openshiftConsoleURL); err != nil {
+	if result, err := r.reconcileCodeReadyWorkspace(workshop, users, appsHostnameSuffix, openshiftConsoleURL); util.IsRequeued(result, err) {
 		return result, err
 	}
 
 	//////////////////////////
 	// Service Mesh
 	//////////////////////////
-	if result, err := r.reconcileServiceMesh(workshop, users); err != nil {
+	if result, err := r.reconcileServiceMesh(workshop, users); util.IsRequeued(result, err) {
 		return result, err
 	}
 
 	//////////////////////////
 	// Serverless
 	//////////////////////////
-	if result, err := r.reconcileServerless(workshop); err != nil {
+	if result, err := r.reconcileServerless(workshop); util.IsRequeued(result, err) {
 		return result, err
 	}
 
 	//////////////////////////
 	// Vault
 	//////////////////////////
-	if result, err := r.reconcileVault(workshop, users); err != nil {
+	if result, err := r.reconcileVault(workshop, users); util.IsRequeued(result, err) {
 		return result, err
 	}
 
 	//////////////////////////
 	// Cert Manager
 	//////////////////////////
-	if result, err := r.reconcileCertManager(workshop, users); err != nil {
+	if result, err := r.reconcileCertManager(workshop, users); util.IsRequeued(result, err) {
 		return result, err
 	}
 
 	//////////////////////////
 	// Istio Workspace
 	//////////////////////////
-	if result, err := r.reconcileIstioWorkspace(workshop, users); err != nil {
+	if result, err := r.reconcileIstioWorkspace(workshop, users); util.IsRequeued(result, err) {
 		return result, err
 	}
 

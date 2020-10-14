@@ -12,6 +12,7 @@ import (
 	routev1 "github.com/openshift/api/route/v1"
 	"github.com/prometheus/common/log"
 
+	"github.com/mcouliba/workshop-operator/util"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -31,7 +32,7 @@ func (r *WorkshopReconciler) reconcileBookbag(workshop *workshopv1.Workshop, use
 		if id <= users && enabled {
 			// Bookback
 			if result, err := r.addUpdateBookbag(workshop, strconv.Itoa(id), guidesNamespace,
-				appsHostnameSuffix, openshiftConsoleURL); err != nil {
+				appsHostnameSuffix, openshiftConsoleURL); util.IsRequeued(result, err) {
 				return result, err
 			}
 		} else {
@@ -45,7 +46,7 @@ func (r *WorkshopReconciler) reconcileBookbag(workshop *workshopv1.Workshop, use
 				break
 			}
 
-			if result, err := r.deleteBookbag(workshop, strconv.Itoa(id), guidesNamespace); err != nil {
+			if result, err := r.deleteBookbag(workshop, strconv.Itoa(id), guidesNamespace); util.IsRequeued(result, err) {
 				return result, err
 			}
 		}

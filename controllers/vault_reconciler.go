@@ -19,11 +19,11 @@ func (r *WorkshopReconciler) reconcileVault(workshop *workshopv1.Workshop, users
 	enabled := workshop.Spec.Infrastructure.Vault.Enabled
 
 	if enabled {
-		if result, err := r.addVaultServer(workshop, users); err != nil {
+		if result, err := r.addVaultServer(workshop, users); util.IsRequeued(result, err) {
 			return result, err
 		}
 
-		if result, err := r.addVaultAgentInjector(workshop, users); err != nil {
+		if result, err := r.addVaultAgentInjector(workshop, users); util.IsRequeued(result, err) {
 			return result, err
 		}
 	}

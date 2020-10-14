@@ -3,7 +3,7 @@ module github.com/mcouliba/workshop-operator
 go 1.15
 
 require (
-	github.com/argoproj-labs/argocd-operator v0.0.13
+	github.com/argoproj-labs/argocd-operator v0.0.12
 	github.com/eclipse/che-operator v0.0.0-20191211154745-df0be398efea
 	github.com/go-logr/logr v0.1.0
 	github.com/go-openapi/spec v0.19.9 // indirect

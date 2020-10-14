@@ -6,6 +6,7 @@ import (
 
 	workshopv1 "github.com/mcouliba/workshop-operator/api/v1"
 	"github.com/mcouliba/workshop-operator/deployment/kubernetes"
+	"github.com/mcouliba/workshop-operator/util"
 	"github.com/prometheus/common/log"
 	corev1 "k8s.io/api/core/v1"
 	rbac "k8s.io/api/rbac/v1"
@@ -26,7 +27,7 @@ func (r *WorkshopReconciler) reconcileProject(workshop *workshopv1.Workshop, use
 		if id <= users && enabledProject {
 			// Project
 			if workshop.Spec.Infrastructure.Project.StagingName != "" {
-				if result, err := r.addProject(workshop, stagingProjectName, username); err != nil {
+				if result, err := r.addProject(workshop, stagingProjectName, username); util.IsRequeued(result, err) {
 					return result, err
 				}
 			}
@@ -41,7 +42,7 @@ func (r *WorkshopReconciler) reconcileProject(workshop *workshopv1.Workshop, use
 			}
 
 			if !(stagingProjectNamespaceErr != nil && errors.IsNotFound(stagingProjectNamespaceErr)) {
-				if result, err := r.deleteProject(stagingProjectNamespace); err != nil {
+				if result, err := r.deleteProject(stagingProjectNamespace); util.IsRequeued(result, err) {
 					return result, err
 				}
 			}

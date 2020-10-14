@@ -30,8 +30,7 @@ func (r *WorkshopReconciler) reconcileCodeReadyWorkspace(workshop *workshopv1.Wo
 	enabled := workshop.Spec.Infrastructure.CodeReadyWorkspace.Enabled
 
 	if enabled {
-
-		if result, err := r.addCodeReadyWorkspace(workshop, users, appsHostnameSuffix, openshiftConsoleURL); err != nil {
+		if result, err := r.addCodeReadyWorkspace(workshop, users, appsHostnameSuffix, openshiftConsoleURL); util.IsRequeued(result, err) {
 			return result, err
 		}
 	}

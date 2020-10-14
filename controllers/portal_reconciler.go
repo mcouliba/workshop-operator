@@ -14,13 +14,14 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
 	workshopv1 "github.com/mcouliba/workshop-operator/api/v1"
+	"github.com/mcouliba/workshop-operator/util"
 )
 
 // reconcilePortal reconciles Portal
 func (r *WorkshopReconciler) reconcilePortal(workshop *workshopv1.Workshop, users int,
 	appsHostnameSuffix string, openshiftConsoleURL string) (reconcile.Result, error) {
 
-	if result, err := r.addRedis(workshop); err != nil {
+	if result, err := r.addRedis(workshop); util.IsRequeued(result, err) {
 		return result, err
 	}
 

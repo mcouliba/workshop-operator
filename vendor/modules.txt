@@ -9,7 +9,7 @@ github.com/alecthomas/template
 github.com/alecthomas/template/parse
 # github.com/alecthomas/units v0.0.0-20190924025748-f65c72e2690d
 github.com/alecthomas/units
-# github.com/argoproj-labs/argocd-operator v0.0.13
+# github.com/argoproj-labs/argocd-operator v0.0.12
 ## explicit
 github.com/argoproj-labs/argocd-operator/pkg/apis/argoproj/v1alpha1
 # github.com/beorn7/perks v1.0.1

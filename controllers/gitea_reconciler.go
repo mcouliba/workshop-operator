@@ -16,6 +16,7 @@ import (
 	routev1 "github.com/openshift/api/route/v1"
 	"github.com/prometheus/common/log"
 
+	"github.com/mcouliba/workshop-operator/util"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
@@ -26,8 +27,7 @@ func (r *WorkshopReconciler) reconcileGitea(workshop *workshopv1.Workshop, users
 	enabledGitea := workshop.Spec.Infrastructure.Gitea.Enabled
 
 	if enabledGitea {
-
-		if result, err := r.addGitea(workshop, users); err != nil {
+		if result, err := r.addGitea(workshop, users); util.IsRequeued(result, err) {
 			return result, err
 		}
 	}

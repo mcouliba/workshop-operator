@@ -6,6 +6,7 @@ import (
 	workshopv1 "github.com/mcouliba/workshop-operator/api/v1"
 	certmanager "github.com/mcouliba/workshop-operator/deployment/certmanager"
 	"github.com/mcouliba/workshop-operator/deployment/kubernetes"
+	"github.com/mcouliba/workshop-operator/util"
 	"github.com/prometheus/common/log"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
@@ -16,8 +17,7 @@ func (r *WorkshopReconciler) reconcileCertManager(workshop *workshopv1.Workshop,
 	enabledCertManager := workshop.Spec.Infrastructure.CertManager.Enabled
 
 	if enabledCertManager {
-
-		if result, err := r.addCertManager(workshop, users); err != nil {
+		if result, err := r.addCertManager(workshop, users); util.IsRequeued(result, err) {
 			return result, err
 		}
 	}

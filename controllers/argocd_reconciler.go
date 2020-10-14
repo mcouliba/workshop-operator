@@ -26,7 +26,7 @@ func (r *WorkshopReconciler) reconcileArgoCD(workshop *workshopv1.Workshop, user
 
 	if enabledArgoCD {
 
-		if result, err := r.addArgoCD(workshop, users, appsHostnameSuffix, openshiftConsoleURL); err != nil {
+		if result, err := r.addArgoCD(workshop, users, appsHostnameSuffix, openshiftConsoleURL); util.IsRequeued(result, err) {
 			return result, err
 		}
 	}

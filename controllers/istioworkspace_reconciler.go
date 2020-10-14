@@ -22,17 +22,8 @@ func (r *WorkshopReconciler) reconcileIstioWorkspace(workshop *workshopv1.Worksh
 
 	if enabled {
 
-		if result, err := r.addIstioWorkspace(workshop, users); err != nil {
+		if result, err := r.addIstioWorkspace(workshop, users); util.IsRequeued(result, err) {
 			return result, err
-		}
-
-		// Installed
-		if workshop.Status.IstioWorkspace != util.OperatorStatus.Installed {
-			workshop.Status.IstioWorkspace = util.OperatorStatus.Installed
-			if err := r.Status().Update(context.TODO(), workshop); err != nil {
-				log.Errorf("Failed to update Workshop status: %s", err)
-				return reconcile.Result{}, err
-			}
 		}
 	}
 
