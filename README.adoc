@@ -38,7 +38,6 @@ Perform the following tasks:
 ----
 oc new-project workshop-infra
 make install
-cd config/default/ && kustomize edit set namespace "workshop-infra" && cd ../..
 make deploy IMG=quay.io/mcouliba/workshop-operator:ocp4.6
 ----
 
@@ -52,16 +51,10 @@ please execute the following command:
 
 [source,bash]
 ----
-oc create -n workshop-infra -f deploy/crds/cloud_native_workshop_cr.yaml
+oc apply -n workshop-infra -f config/samples/workshop_v1_cloud_native_workshop.yaml
 ----
 
 == Development
-
-=== Requirements
-
-* OpenShift 4.3
-* Operator-SDK v0.8.0
-* Docker
 
 === Build and Push the Operator Image
 

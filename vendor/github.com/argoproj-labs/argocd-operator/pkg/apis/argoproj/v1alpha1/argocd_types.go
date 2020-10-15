@@ -59,6 +59,14 @@ type ArgoCDApplicationControllerSpec struct {
 
 	// Resources defines the Compute Resources required by the container for the Application Controller.
 	Resources *corev1.ResourceRequirements `json:"resources,omitempty"`
+
+	// AppSync is used to control the sync frequency, by default the ArgoCD
+	// controller polls Git every 3m by default.
+	//
+	// Set this to a duration, e.g. 10m or 600s to control the synchronisation
+	// frequency.
+	// +optional
+	AppSync *metav1.Duration `json:"appSync,omitempty"`
 }
 
 // ArgoCDCASpec defines the CA options for ArgCD.
@@ -131,6 +139,12 @@ type ArgoCDGrafanaSpec struct {
 type ArgoCDHASpec struct {
 	// Enabled will toggle HA support globally for Argo CD.
 	Enabled bool `json:"enabled"`
+
+	// RedisProxyImage is the Redis HAProxy container image.
+	RedisProxyImage string `json:"redisProxyImage,omitempty"`
+
+	// RedisProxyVersion is the Redis HAProxy container image tag.
+	RedisProxyVersion string `json:"redisProxyVersion,omitempty"`
 }
 
 // ArgoCDImportSpec defines the desired state for the ArgoCD import/restore process.
@@ -345,7 +359,7 @@ type ArgoCDSpec struct {
 	InitialRepositories string `json:"initialRepositories,omitempty"`
 
 	// InitialSSHKnownHosts defines the SSH known hosts data upon creation of the cluster for connecting Git repositories via SSH.
-	InitialSSHKnownHosts string `json:"initialSSHKnownHosts,omitempty"`
+	InitialSSHKnownHosts SSHHostsSpec `json:"initialSSHKnownHosts,omitempty"`
 
 	// KustomizeBuildOptions is used to specify build options/parameters to use with `kustomize build`.
 	KustomizeBuildOptions string `json:"kustomizeBuildOptions,omitempty"`
@@ -373,6 +387,10 @@ type ArgoCDSpec struct {
 
 	// ResourceExclusions is used to completely ignore entire classes of resource group/kinds.
 	ResourceExclusions string `json:"resourceExclusions,omitempty"`
+
+	// ResourceInclusions is used to only include specific group/kinds in the
+	// reconciliation process.
+	ResourceInclusions string `json:"resourceInclusions,omitempty"`
 
 	// Server defines the options for the ArgoCD Server component.
 	Server ArgoCDServerSpec `json:"server,omitempty"`
@@ -450,4 +468,14 @@ type ArgoCDTLSSpec struct {
 
 	// InitialCerts defines custom TLS certificates upon creation of the cluster for connecting Git repositories via HTTPS.
 	InitialCerts map[string]string `json:"initialCerts,omitempty"`
+}
+
+type SSHHostsSpec struct {
+	// ExcludeDefaultHosts describes whether you would like to include the default
+	// list of SSH Known Hosts provided by ArgoCD.
+	ExcludeDefaultHosts bool `json:"excludedefaulthosts,omitempty"`
+
+	// Keys describes a custom set of SSH Known Hosts that you would like to
+	// have included in your ArgoCD server.
+	Keys string `json:"keys,omitempty"`
 }

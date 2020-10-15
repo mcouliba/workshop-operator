@@ -111,10 +111,6 @@ github.com/antihax/optional v1.0.0/go.mod h1:uupD/76wgC+ih3iEmQUL+0Ugr19nfwCT1kd
 github.com/apache/arrow/go/arrow v0.0.0-20191024131854-af6fa24be0db/go.mod h1:VTxUBvSJ3s3eHAg65PNgrsn5BtqCRPdmyXh6rAfdxN0=
 github.com/apache/thrift v0.12.0/go.mod h1:cp2SuWMxlEZw2r+iP2GNCdIi4C1qmUzdZFSVb+bacwQ=
 github.com/apache/thrift v0.13.0/go.mod h1:cp2SuWMxlEZw2r+iP2GNCdIi4C1qmUzdZFSVb+bacwQ=
-github.com/argoproj-labs/argocd-operator v0.0.12 h1:vSURuz3SdwKs7idcrVir5aJZjcZVr/DYkVJSjTdx5BQ=
-github.com/argoproj-labs/argocd-operator v0.0.12/go.mod h1:Ij5hdqvwrpoSbEpB90ywsiT2rHIsJ4AuNLZiykGYrTk=
-github.com/argoproj-labs/argocd-operator v0.0.13 h1:xuh2ZuTjoyDwi1LhntXc+MS6IxsTIgFAdDl26QsrtHQ=
-github.com/argoproj-labs/argocd-operator v0.0.13/go.mod h1:Ij5hdqvwrpoSbEpB90ywsiT2rHIsJ4AuNLZiykGYrTk=
 github.com/argoproj-labs/argocd-operator v0.0.14 h1:nmDXrIg+DHsvg7xwCF/kQTmb+wuf3n477K6lLn3RbPo=
 github.com/argoproj-labs/argocd-operator v0.0.14/go.mod h1:Or5hzki93IimfFZl6VC6VvTWcdaqa1/HpAEwGNF14R8=
 github.com/argoproj/argo-cd v1.5.8/go.mod h1:UPOPiF6Y1y/oTL3X1KcuLbu7ljD7f4+SIaXvlowBmhE=

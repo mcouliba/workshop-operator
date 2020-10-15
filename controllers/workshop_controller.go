@@ -48,6 +48,16 @@ const workshopFinalizer = "finalizer.workshop.mcouliba.com"
 
 // +kubebuilder:rbac:groups=workshop.mcouliba.com,resources=workshops,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=workshop.mcouliba.com,resources=workshops/status,verbs=get;update;patch
+// +kubebuilder:rbac:groups=route.openshift.io,resources=routes,verbs=get;watch;create;update;delete
+// +kubebuilder:rbac:groups=security.openshift.io,resources=securitycontextconstraints,verbs=list;watch;update
+// +kubebuilder:rbac:groups=rbac.authorization.k8s.io,resources=roles;rolebindings;clusterroles;clusterrolebindings,verbs=get;watch;create;update;delete
+// +kubebuilder:rbac:groups=apiextensions.k8s.io,resources=customresourcedefinitions,verbs=get;watch;create;update;delete
+// +kubebuilder:rbac:groups=org.eclipse.che,resources=checlusters,verbs=get;watch;create;update;delete
+// +kubebuilder:rbac:groups=maistra.io,resources=servicemeshcontrolplanes;servicemeshmemberrolls,verbs=get;watch;create;update;delete
+// +kubebuilder:rbac:groups=admissionregistration.k8s.io,resources=mutatingwebhookconfigurations,verbs=get;watch;create;update;delete
+// +kubebuilder:rbac:groups=gpte.opentlc.com,resources=nexus;giteas,verbs=get;watch;create;update;delete
+// +kubebuilder:rbac:groups=operators.coreos.comresources=operatorgroups;subscriptions;clusterserviceversions;installplans,verbs=get;watch;create;update;delete
+// +kubebuilder:rbac:groups=argoproj.io,resources=argocds,verbs=get;watch;create;update;delete
 
 func (r *WorkshopReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	ctx := context.Background()
