@@ -5,8 +5,8 @@ import (
 	"fmt"
 
 	workshopv1 "github.com/mcouliba/workshop-operator/api/v1"
-	"github.com/mcouliba/workshop-operator/deployment/kubernetes"
-	"github.com/mcouliba/workshop-operator/util"
+	"github.com/mcouliba/workshop-operator/common/kubernetes"
+	"github.com/mcouliba/workshop-operator/common/util"
 	"github.com/prometheus/common/log"
 	"github.com/sirupsen/logrus"
 	corev1 "k8s.io/api/core/v1"

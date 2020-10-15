@@ -6,10 +6,10 @@ import (
 	"time"
 
 	workshopv1 "github.com/mcouliba/workshop-operator/api/v1"
-	"github.com/mcouliba/workshop-operator/deployment/kubernetes"
-	smcp "github.com/mcouliba/workshop-operator/deployment/maistra/servicemeshcontrolplane"
-	smmr "github.com/mcouliba/workshop-operator/deployment/maistra/servicemeshmemberroll"
-	"github.com/mcouliba/workshop-operator/util"
+	"github.com/mcouliba/workshop-operator/common/kubernetes"
+	smcp "github.com/mcouliba/workshop-operator/common/maistra/servicemeshcontrolplane"
+	smmr "github.com/mcouliba/workshop-operator/common/maistra/servicemeshmemberroll"
+	"github.com/mcouliba/workshop-operator/common/util"
 	"github.com/prometheus/common/log"
 
 	rbac "k8s.io/api/rbac/v1"

@@ -4,9 +4,9 @@ import (
 	"context"
 	"reflect"
 
-	"github.com/mcouliba/workshop-operator/deployment/kubernetes"
-	"github.com/mcouliba/workshop-operator/deployment/redis"
-	"github.com/mcouliba/workshop-operator/deployment/usernamedistribution"
+	"github.com/mcouliba/workshop-operator/common/kubernetes"
+	"github.com/mcouliba/workshop-operator/common/redis"
+	"github.com/mcouliba/workshop-operator/common/usernamedistribution"
 	"github.com/prometheus/common/log"
 	appsv1 "k8s.io/api/apps/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -14,7 +14,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
 	workshopv1 "github.com/mcouliba/workshop-operator/api/v1"
-	"github.com/mcouliba/workshop-operator/util"
+	"github.com/mcouliba/workshop-operator/common/util"
 )
 
 // reconcilePortal reconciles Portal

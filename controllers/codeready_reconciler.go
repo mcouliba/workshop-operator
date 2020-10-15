@@ -14,9 +14,9 @@ import (
 	"time"
 
 	workshopv1 "github.com/mcouliba/workshop-operator/api/v1"
-	"github.com/mcouliba/workshop-operator/deployment/codeready"
-	"github.com/mcouliba/workshop-operator/deployment/kubernetes"
-	"github.com/mcouliba/workshop-operator/util"
+	"github.com/mcouliba/workshop-operator/common/codeready"
+	"github.com/mcouliba/workshop-operator/common/kubernetes"
+	"github.com/mcouliba/workshop-operator/common/util"
 	"github.com/prometheus/common/log"
 
 	"k8s.io/apimachinery/pkg/api/errors"

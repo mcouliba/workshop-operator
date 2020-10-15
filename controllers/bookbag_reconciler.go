@@ -7,12 +7,12 @@ import (
 	"strconv"
 
 	workshopv1 "github.com/mcouliba/workshop-operator/api/v1"
-	"github.com/mcouliba/workshop-operator/deployment/bookbag"
-	"github.com/mcouliba/workshop-operator/deployment/kubernetes"
+	"github.com/mcouliba/workshop-operator/common/bookbag"
+	"github.com/mcouliba/workshop-operator/common/kubernetes"
 	routev1 "github.com/openshift/api/route/v1"
 	"github.com/prometheus/common/log"
 
-	"github.com/mcouliba/workshop-operator/util"
+	"github.com/mcouliba/workshop-operator/common/util"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"

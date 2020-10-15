@@ -4,9 +4,9 @@ import (
 	"context"
 
 	workshopv1 "github.com/mcouliba/workshop-operator/api/v1"
-	certmanager "github.com/mcouliba/workshop-operator/deployment/certmanager"
-	"github.com/mcouliba/workshop-operator/deployment/kubernetes"
-	"github.com/mcouliba/workshop-operator/util"
+	certmanager "github.com/mcouliba/workshop-operator/common/certmanager"
+	"github.com/mcouliba/workshop-operator/common/kubernetes"
+	"github.com/mcouliba/workshop-operator/common/util"
 	"github.com/prometheus/common/log"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"

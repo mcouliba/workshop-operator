@@ -1,0 +1,72 @@
+= Workshop Operator
+
+
+== Overview
+
+This is an https://coreos.com/operators/[Kubernetes Operator^] to install the infrastructure 
+for running workshops on OpenShift provided by RHPDS.
+
+[IMPORTANT]
+====
+This operator has been tested on **OpenShift Container Platform 4.x** 
+with **N preconfigured users (user1, user2, ..., userN)**. 
+====
+
+== Deploy the Operator
+
+[IMPORTANT]
+====
+Please use an OpenShift user with **cluster-admin** privileges
+====
+
+=== Run it from your local environment
+
+Perform the following tasks:
+
+[source,bash]
+----
+oc new-project workshop-infra
+make install
+make run ENABLE_WEBHOOKS=false
+----
+
+=== Deploy it on OpenShift
+
+Perform the following tasks:
+
+[source,bash]
+----
+oc new-project workshop-infra
+make install
+cd config/default/ && kustomize edit set namespace "workshop-infra" && cd ../..
+make deploy IMG=quay.io/mcouliba/workshop-operator:ocp4.6
+----
+
+== Install the Workshop Infrastructure
+
+The Workshop Infrastructure is deployed by creating a Custom Resource based on the **WorkShop** Custom Resource Definition. 
+There is examples of custom resources (CR) in https://github.com/mcouliba/openshift-workshop-operator/tree/master/deploy/crds[crds]
+
+For instance, to deploy the Workshop Infrastruture for the Cloud-Native Workshop,
+please execute the following command:
+
+[source,bash]
+----
+oc create -n workshop-infra -f deploy/crds/cloud_native_workshop_cr.yaml
+----
+
+== Development
+
+=== Requirements
+
+* OpenShift 4.3
+* Operator-SDK v0.8.0
+* Docker
+
+=== Build and Push the Operator Image
+
+[source,bash]
+----
+make docker-build IMG=quay.io/mcouliba/workshop-operator:ocp4.6
+make docker-push IMG=quay.io/mcouliba/workshop-operator:ocp4.6
+----

@@ -11,12 +11,12 @@ import (
 	"time"
 
 	workshopv1 "github.com/mcouliba/workshop-operator/api/v1"
-	"github.com/mcouliba/workshop-operator/deployment/gitea"
-	"github.com/mcouliba/workshop-operator/deployment/kubernetes"
+	"github.com/mcouliba/workshop-operator/common/gitea"
+	"github.com/mcouliba/workshop-operator/common/kubernetes"
 	routev1 "github.com/openshift/api/route/v1"
 	"github.com/prometheus/common/log"
 
-	"github.com/mcouliba/workshop-operator/util"
+	"github.com/mcouliba/workshop-operator/common/util"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
