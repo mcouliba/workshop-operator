@@ -14,6 +14,8 @@ rules:
   - create
   - delete
   - get
+  - list
+  - patch
   - update
   - watch
 - apiGroups:
@@ -24,6 +26,8 @@ rules:
   - create
   - delete
   - get
+  - list
+  - patch
   - update
   - watch
 - apiGroups:
@@ -34,17 +38,28 @@ rules:
   - create
   - delete
   - get
+  - list
+  - patch
   - update
   - watch
 - apiGroups:
-  - clusterserviceversions
-  - installplans
-  - operators.coreos.comresources=operatorgroups
-  - subscriptions
+  - ""
+  resources:
+  - configmaps
+  - endpoints
+  - events
+  - namespaces
+  - persistentvolumeclaims
+  - pods
+  - secrets
+  - serviceaccounts
+  - services
   verbs:
   - create
   - delete
   - get
+  - list
+  - patch
   - update
   - watch
 - apiGroups:
@@ -56,6 +71,8 @@ rules:
   - create
   - delete
   - get
+  - list
+  - patch
   - update
   - watch
 - apiGroups:
@@ -67,6 +84,23 @@ rules:
   - create
   - delete
   - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - operators.coreos.com
+  resources:
+  - clusterserviceversions
+  - installplans
+  - operatorgroups
+  - subscriptions
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
   - update
   - watch
 - apiGroups:
@@ -77,6 +111,8 @@ rules:
   - create
   - delete
   - get
+  - list
+  - patch
   - update
   - watch
 - apiGroups:
@@ -90,6 +126,8 @@ rules:
   - create
   - delete
   - get
+  - list
+  - patch
   - update
   - watch
 - apiGroups:
@@ -100,6 +138,8 @@ rules:
   - create
   - delete
   - get
+  - list
+  - patch
   - update
   - watch
 - apiGroups:
