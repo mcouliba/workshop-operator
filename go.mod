@@ -12,7 +12,6 @@ require (
 	github.com/openshift/api v3.9.1-0.20190916204813-cdbe64fb0c91+incompatible
 	github.com/operator-framework/api v0.3.17
 	github.com/prometheus/common v0.14.0
-	github.com/sirupsen/logrus v1.6.0
 	golang.org/x/crypto v0.0.0-20201002170205-7f63de1d35b0
 	k8s.io/api v0.18.9
 	k8s.io/apiextensions-apiserver v0.18.9

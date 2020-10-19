@@ -8,7 +8,6 @@ import (
 	"github.com/mcouliba/workshop-operator/common/kubernetes"
 	"github.com/mcouliba/workshop-operator/common/util"
 	"github.com/prometheus/common/log"
-	"github.com/sirupsen/logrus"
 	corev1 "k8s.io/api/core/v1"
 	rbac "k8s.io/api/rbac/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -130,7 +129,7 @@ func (r *WorkshopReconciler) manageRoles(workshop *workshopv1.Workshop, projectN
 	if err := r.Create(context.TODO(), argocdEditRoleBinding); err != nil && !errors.IsAlreadyExists(err) {
 		return reconcile.Result{}, err
 	} else if err == nil {
-		logrus.Infof("Created %s Role Binding", argocdEditRoleBinding.Name)
+		log.Infof("Created %s Role Binding", argocdEditRoleBinding.Name)
 	}
 
 	//Success
