@@ -100,7 +100,7 @@ func (r *WorkshopReconciler) manageRoles(workshop *workshopv1.Workshop, projectN
 	users = append(users, userSubject)
 
 	// User
-	userRoleBinding := kubernetes.NewRoleBindingUsers(workshop, r.Scheme, "edit", projectName, labels,
+	userRoleBinding := kubernetes.NewRoleBindingUsers(workshop, r.Scheme, username+"-project", projectName, labels,
 		users, "edit", "ClusterRole")
 	if err := r.Create(context.TODO(), userRoleBinding); err != nil && !errors.IsAlreadyExists(err) {
 		return reconcile.Result{}, err
@@ -109,7 +109,7 @@ func (r *WorkshopReconciler) manageRoles(workshop *workshopv1.Workshop, projectN
 	}
 
 	// Default
-	defaultRoleBinding := kubernetes.NewRoleBindingSA(workshop, r.Scheme, "view", projectName, labels,
+	defaultRoleBinding := kubernetes.NewRoleBindingSA(workshop, r.Scheme, username+"-default", projectName, labels,
 		"default", "view", "ClusterRole")
 	if err := r.Create(context.TODO(), defaultRoleBinding); err != nil && !errors.IsAlreadyExists(err) {
 		return reconcile.Result{}, err

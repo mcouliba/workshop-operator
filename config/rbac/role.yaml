@@ -147,13 +147,7 @@ rules:
   - rolebindings
   - roles
   verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
+  - '*'
 - apiGroups:
   - route.openshift.io
   resources:
@@ -180,13 +174,7 @@ rules:
   - workshops
   - workshops/finalizers
   verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
+  - '*'
 - apiGroups:
   - workshop.mcouliba.com
   resources:
