@@ -31,6 +31,24 @@ rules:
   - update
   - watch
 - apiGroups:
+  - apps
+  resources:
+  - deployments
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - apps
+  resources:
+  - deployments/finalizers
+  verbs:
+  - update
+- apiGroups:
   - argoproj.io
   resources:
   - argocds
@@ -116,6 +134,12 @@ rules:
   - update
   - watch
 - apiGroups:
+  - project.openshift.io
+  resources:
+  - projectrequests
+  verbs:
+  - create
+- apiGroups:
   - rbac.authorization.k8s.io
   resources:
   - clusterrolebindings
@@ -154,6 +178,7 @@ rules:
   - workshop.mcouliba.com
   resources:
   - workshops
+  - workshops/finalizers
   verbs:
   - create
   - delete

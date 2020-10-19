@@ -100,8 +100,8 @@ func (r *WorkshopReconciler) manageRoles(workshop *workshopv1.Workshop, projectN
 	users = append(users, userSubject)
 
 	// User
-	userRoleBinding := kubernetes.NewRoleBindingUsers(workshop, r.Scheme, username+"-admin", projectName, labels,
-		users, "admin", "ClusterRole")
+	userRoleBinding := kubernetes.NewRoleBindingUsers(workshop, r.Scheme, "edit", projectName, labels,
+		users, "edit", "ClusterRole")
 	if err := r.Create(context.TODO(), userRoleBinding); err != nil && !errors.IsAlreadyExists(err) {
 		return reconcile.Result{}, err
 	} else if err == nil {
