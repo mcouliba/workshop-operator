@@ -6,16 +6,20 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"reflect"
 	"strings"
 	"time"
 
+	argocdv1 "github.com/argoproj-labs/argocd-operator/pkg/apis/argoproj/v1alpha1"
 	workshopv1 "github.com/mcouliba/workshop-operator/api/v1"
 	"github.com/mcouliba/workshop-operator/common/argocd"
 	"github.com/mcouliba/workshop-operator/common/kubernetes"
 	"github.com/mcouliba/workshop-operator/common/util"
 	"github.com/prometheus/common/log"
 	"golang.org/x/crypto/bcrypt"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
 
@@ -116,6 +120,19 @@ g, ` + username + `, ` + userRole + `
 		return reconcile.Result{}, err
 	} else if err == nil {
 		log.Infof("Created %s Secret", secret.Name)
+	} else if errors.IsAlreadyExists(err) {
+		secretFound := &corev1.Secret{}
+		if err := r.Get(context.TODO(), types.NamespacedName{Name: secret.Name, Namespace: namespace.Name}, secretFound); err != nil {
+			return reconcile.Result{}, err
+		} else if err == nil {
+			if !reflect.DeepEqual(secretData, secretFound.StringData) {
+				secretFound.StringData = secretData
+				if err := r.Update(context.TODO(), secretFound); err != nil {
+					return reconcile.Result{}, err
+				}
+				log.Infof("Updated %s Secret", secretFound.Name)
+			}
+		}
 	}
 
 	labels["app.kubernetes.io/name"] = "argocd-cm"
@@ -124,6 +141,19 @@ g, ` + username + `, ` + userRole + `
 		return reconcile.Result{}, err
 	} else if err == nil {
 		log.Infof("Created %s ConfigMap", configmap.Name)
+	} else if errors.IsAlreadyExists(err) {
+		configmapFound := &corev1.ConfigMap{}
+		if err := r.Get(context.TODO(), types.NamespacedName{Name: configmap.Name, Namespace: namespace.Name}, configmapFound); err != nil {
+			return reconcile.Result{}, err
+		} else if err == nil {
+			if !reflect.DeepEqual(configMapData, configmapFound.Data) {
+				configmapFound.Data = configMapData
+				if err := r.Update(context.TODO(), configmapFound); err != nil {
+					return reconcile.Result{}, err
+				}
+				log.Infof("Updated %s ConfigMap", configmapFound.Name)
+			}
+		}
 	}
 
 	labels["app.kubernetes.io/name"] = "argocd-cr"
@@ -132,6 +162,19 @@ g, ` + username + `, ` + userRole + `
 		return reconcile.Result{}, err
 	} else if err == nil {
 		log.Infof("Created %s Custom Resource", customResource.Name)
+	} else if errors.IsAlreadyExists(err) {
+		customResourceFound := &argocdv1.ArgoCD{}
+		if err := r.Get(context.TODO(), types.NamespacedName{Name: customResource.Name, Namespace: namespace.Name}, customResourceFound); err != nil {
+			return reconcile.Result{}, err
+		} else if err == nil {
+			if !reflect.DeepEqual(&argocdPolicy, customResourceFound.Spec.RBAC.Policy) {
+				customResourceFound.Spec.RBAC.Policy = &argocdPolicy
+				if err := r.Update(context.TODO(), customResourceFound); err != nil {
+					return reconcile.Result{}, err
+				}
+				log.Infof("Updated %s Custom Resource", customResourceFound.Name)
+			}
+		}
 	}
 
 	// Wait for ArgoCD Dex Server to be running
