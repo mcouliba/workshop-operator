@@ -70,12 +70,12 @@ func (r *WorkshopReconciler) addCodeReadyWorkspace(workshop *workshopv1.Workshop
 	// Approve the installation
 	if err := r.ApproveInstallPlan(clusterServiceVersion, "codeready-workspaces", codeReadyWorkspacesNamespace.Name); err != nil {
 		log.Warnf("Waiting for Subscription to create InstallPlan for %s", "codeready-workspaces")
-		return reconcile.Result{}, err
+		return reconcile.Result{Requeue: true}, nil
 	}
 
 	// Wait for CodeReadyWorkspace Operator to be running
 	if !kubernetes.GetK8Client().GetDeploymentStatus("codeready-operator", codeReadyWorkspacesNamespace.Name) {
-		return reconcile.Result{Requeue: true, RequeueAfter: time.Second * 1}, nil
+		return reconcile.Result{Requeue: true}, nil
 	}
 
 	codeReadyWorkspacesCustomResource := codeready.NewCustomResource(workshop, r.Scheme, "codereadyworkspaces", codeReadyWorkspacesNamespace.Name)

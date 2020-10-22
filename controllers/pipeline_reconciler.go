@@ -43,7 +43,7 @@ func (r *WorkshopReconciler) addPipeline(workshop *workshopv1.Workshop) (reconci
 	// Approve the installation
 	if err := r.ApproveInstallPlan(clusterServiceVersion, name, "openshift-operators"); err != nil {
 		log.Infof("Waiting for Subscription to create InstallPlan for %s", name)
-		return reconcile.Result{}, err
+		return reconcile.Result{Requeue: true}, nil
 	}
 
 	//Success

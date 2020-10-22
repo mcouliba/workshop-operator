@@ -64,11 +64,6 @@ func (r *WorkshopReconciler) addServiceMesh(workshop *workshopv1.Workshop, users
 		return reconcile.Result{Requeue: true}, nil
 	}
 
-	// Wait for Operator to be running
-	if !kubernetes.GetK8Client().GetDeploymentStatus("servicemeshoperator", "openshift-operators") {
-		return reconcile.Result{Requeue: true}, nil
-	}
-
 	// Deploy Service Mesh
 	istioSystemNamespace := kubernetes.NewNamespace(workshop, r.Scheme, "istio-system")
 	if err := r.Create(context.TODO(), istioSystemNamespace); err != nil && !errors.IsAlreadyExists(err) {
@@ -174,11 +169,6 @@ func (r *WorkshopReconciler) addElasticSearchOperator(workshop *workshopv1.Works
 		return reconcile.Result{Requeue: true}, nil
 	}
 
-	// Wait for Operator to be running
-	if !kubernetes.GetK8Client().GetDeploymentStatus("elasticsearch-operator", "openshift-operators-redhat") {
-		return reconcile.Result{Requeue: true}, nil
-	}
-
 	//Success
 	return reconcile.Result{}, nil
 }
@@ -201,11 +191,6 @@ func (r *WorkshopReconciler) addJaegerOperator(workshop *workshopv1.Workshop) (r
 		return reconcile.Result{Requeue: true}, nil
 	}
 
-	// Wait for Operator to be running
-	if !kubernetes.GetK8Client().GetDeploymentStatus("jaeger-product", "openshift-operators") {
-		return reconcile.Result{Requeue: true}, nil
-	}
-
 	//Success
 	return reconcile.Result{}, nil
 }
@@ -225,11 +210,6 @@ func (r *WorkshopReconciler) addKialiOperator(workshop *workshopv1.Workshop) (re
 
 	if err := r.ApproveInstallPlan(clusterserviceversion, "kiali-ossm", "openshift-operators"); err != nil {
 		log.Infof("Waiting for Subscription to create InstallPlan for %s", subscription.Name)
-		return reconcile.Result{Requeue: true}, nil
-	}
-
-	// Wait for Operator to be running
-	if !kubernetes.GetK8Client().GetDeploymentStatus("kiali-ossm", "openshift-operators") {
 		return reconcile.Result{Requeue: true}, nil
 	}
 
