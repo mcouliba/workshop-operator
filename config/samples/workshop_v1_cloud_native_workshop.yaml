@@ -48,11 +48,11 @@ spec:
       enabled: true
       serviceMeshOperatorHub:
         channel: "stable"
-        clusterServiceVersion: servicemeshoperator.v1.1.9
+        clusterServiceVersion: servicemeshoperator.v1.1.10
       elasticSearchOperatorHub:
         channel: "4.5"
       jaegerOperatorHub:
         channel: "stable"
       kialiOperatorHub:
         channel: "stable"
-        clusterServiceVersion: kiali-operator.v1.12.15
+        clusterServiceVersion: kiali-operator.v1.12.16

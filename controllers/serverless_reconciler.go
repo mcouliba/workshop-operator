@@ -29,13 +29,22 @@ func (r *WorkshopReconciler) reconcileServerless(workshop *workshopv1.Workshop) 
 
 func (r *WorkshopReconciler) addServerless(workshop *workshopv1.Workshop) (reconcile.Result, error) {
 
-	serverlessSubscription := kubernetes.NewRedHatSubscription(workshop, r.Scheme, "serverless-operator", "openshift-operators", "serverless-operator",
-		workshop.Spec.Infrastructure.Serverless.OperatorHub.Channel,
-		workshop.Spec.Infrastructure.Serverless.OperatorHub.ClusterServiceVersion)
-	if err := r.Create(context.TODO(), serverlessSubscription); err != nil && !errors.IsAlreadyExists(err) {
+	channel := workshop.Spec.Infrastructure.Serverless.OperatorHub.Channel
+	clusterServiceVersion := workshop.Spec.Infrastructure.Serverless.OperatorHub.ClusterServiceVersion
+
+	namespace := kubernetes.NewNamespace(workshop, r.Scheme, "openshift-serverless")
+	if err := r.Create(context.TODO(), namespace); err != nil && !errors.IsAlreadyExists(err) {
 		return reconcile.Result{}, err
 	} else if err == nil {
-		log.Infof("Created %s Subscription", serverlessSubscription.Name)
+		log.Infof("Created %s Project", namespace.Name)
+	}
+
+	subscription := kubernetes.NewRedHatSubscription(workshop, r.Scheme, "serverless-operator", namespace.Name, "serverless-operator",
+		channel, clusterServiceVersion)
+	if err := r.Create(context.TODO(), subscription); err != nil && !errors.IsAlreadyExists(err) {
+		return reconcile.Result{}, err
+	} else if err == nil {
+		log.Infof("Created %s Subscription", subscription.Name)
 	}
 
 	knativeServingNamespace := kubernetes.NewNamespace(workshop, r.Scheme, "knative-serving")
@@ -43,6 +52,13 @@ func (r *WorkshopReconciler) addServerless(workshop *workshopv1.Workshop) (recon
 		return reconcile.Result{}, err
 	} else if err == nil {
 		log.Infof("Created %s Namespace", knativeServingNamespace.Name)
+	}
+
+	knativeEventingNamespace := kubernetes.NewNamespace(workshop, r.Scheme, "knative-eventing")
+	if err := r.Create(context.TODO(), knativeEventingNamespace); err != nil && !errors.IsAlreadyExists(err) {
+		return reconcile.Result{}, err
+	} else if err == nil {
+		log.Infof("Created %s Namespace", knativeEventingNamespace.Name)
 	}
 
 	// TODO

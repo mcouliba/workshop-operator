@@ -61,7 +61,12 @@ func (r *WorkshopReconciler) addServiceMesh(workshop *workshopv1.Workshop, users
 
 	if err := r.ApproveInstallPlan(clusterserviceversion, "servicemeshoperator", "openshift-operators"); err != nil {
 		log.Infof("Waiting for Subscription to create InstallPlan for %s", subscription.Name)
-		return reconcile.Result{}, err
+		return reconcile.Result{Requeue: true}, nil
+	}
+
+	// Wait for Operator to be running
+	if !kubernetes.GetK8Client().GetDeploymentStatus("servicemeshoperator", "openshift-operators") {
+		return reconcile.Result{Requeue: true}, nil
 	}
 
 	// Deploy Service Mesh
@@ -166,7 +171,12 @@ func (r *WorkshopReconciler) addElasticSearchOperator(workshop *workshopv1.Works
 
 	if err := r.ApproveInstallPlan(clusterserviceversion, "elasticsearch-operator", "openshift-operators-redhat"); err != nil {
 		log.Infof("Waiting for Subscription to create InstallPlan for %s", subscription.Name)
-		return reconcile.Result{}, err
+		return reconcile.Result{Requeue: true}, nil
+	}
+
+	// Wait for Operator to be running
+	if !kubernetes.GetK8Client().GetDeploymentStatus("elasticsearch-operator", "openshift-operators-redhat") {
+		return reconcile.Result{Requeue: true}, nil
 	}
 
 	//Success
@@ -188,7 +198,12 @@ func (r *WorkshopReconciler) addJaegerOperator(workshop *workshopv1.Workshop) (r
 
 	if err := r.ApproveInstallPlan(clusterserviceversion, "jaeger-product", "openshift-operators"); err != nil {
 		log.Infof("Waiting for Subscription to create InstallPlan for %s", subscription.Name)
-		return reconcile.Result{}, err
+		return reconcile.Result{Requeue: true}, nil
+	}
+
+	// Wait for Operator to be running
+	if !kubernetes.GetK8Client().GetDeploymentStatus("jaeger-product", "openshift-operators") {
+		return reconcile.Result{Requeue: true}, nil
 	}
 
 	//Success
@@ -210,7 +225,12 @@ func (r *WorkshopReconciler) addKialiOperator(workshop *workshopv1.Workshop) (re
 
 	if err := r.ApproveInstallPlan(clusterserviceversion, "kiali-ossm", "openshift-operators"); err != nil {
 		log.Infof("Waiting for Subscription to create InstallPlan for %s", subscription.Name)
-		return reconcile.Result{}, err
+		return reconcile.Result{Requeue: true}, nil
+	}
+
+	// Wait for Operator to be running
+	if !kubernetes.GetK8Client().GetDeploymentStatus("kiali-ossm", "openshift-operators") {
+		return reconcile.Result{Requeue: true}, nil
 	}
 
 	//Success
