@@ -65,6 +65,11 @@ func (r *WorkshopReconciler) addServiceMesh(workshop *workshopv1.Workshop, users
 		return reconcile.Result{Requeue: true}, nil
 	}
 
+	// Wait for Operator to be running
+	if !kubernetes.GetK8Client().GetDeploymentStatus("istio-operator", "openshift-operators") {
+		return reconcile.Result{Requeue: true}, nil
+	}
+
 	// Deploy Service Mesh
 	istioSystemNamespace := kubernetes.NewNamespace(workshop, r.Scheme, "istio-system")
 	if err := r.Create(context.TODO(), istioSystemNamespace); err != nil && !errors.IsAlreadyExists(err) {
@@ -78,8 +83,9 @@ func (r *WorkshopReconciler) addServiceMesh(workshop *workshopv1.Workshop, users
 
 	if workshop.Spec.Infrastructure.ArgoCD.Enabled {
 		argocdSubject := rbac.Subject{
-			Kind: rbac.UserKind,
-			Name: "system:serviceaccount:argocd:argocd-application-controller",
+			Kind:     rbac.UserKind,
+			Name:     "system:serviceaccount:argocd:argocd-application-controller",
+			APIGroup: "rbac.authorization.k8s.io",
 		}
 		istioUsers = append(istioUsers, argocdSubject)
 	}
@@ -88,8 +94,9 @@ func (r *WorkshopReconciler) addServiceMesh(workshop *workshopv1.Workshop, users
 		username := fmt.Sprintf("user%d", id)
 		stagingProjectName := fmt.Sprintf("%s%d", workshop.Spec.Infrastructure.Project.StagingName, id)
 		userSubject := rbac.Subject{
-			Kind: rbac.UserKind,
-			Name: username,
+			Kind:     rbac.UserKind,
+			Name:     username,
+			APIGroup: "rbac.authorization.k8s.io",
 		}
 
 		istioMembers = append(istioMembers, stagingProjectName)

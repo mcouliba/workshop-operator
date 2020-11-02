@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"reflect"
 	"strings"
-	"time"
 
 	argocdv1 "github.com/argoproj-labs/argocd-operator/pkg/apis/argoproj/v1alpha1"
 	workshopv1 "github.com/mcouliba/workshop-operator/api/v1"
@@ -73,7 +72,7 @@ func (r *WorkshopReconciler) addArgoCD(workshop *workshopv1.Workshop, users int,
 		return reconcile.Result{Requeue: true}, nil
 	}
 
-	// Wait for ArgoCD Operator to be running
+	// Wait for Operator to be running
 	if !kubernetes.GetK8Client().GetDeploymentStatus("argocd-operator", namespace.Name) {
 		return reconcile.Result{Requeue: true}, nil
 	}
@@ -120,19 +119,19 @@ g, ` + username + `, ` + userRole + `
 		return reconcile.Result{}, err
 	} else if err == nil {
 		log.Infof("Created %s Secret", secret.Name)
-	} else if errors.IsAlreadyExists(err) {
-		secretFound := &corev1.Secret{}
-		if err := r.Get(context.TODO(), types.NamespacedName{Name: secret.Name, Namespace: namespace.Name}, secretFound); err != nil {
-			return reconcile.Result{}, err
-		} else if err == nil {
-			if !reflect.DeepEqual(secretData, secretFound.StringData) {
-				secretFound.StringData = secretData
-				if err := r.Update(context.TODO(), secretFound); err != nil {
-					return reconcile.Result{}, err
-				}
-				log.Infof("Updated %s Secret", secretFound.Name)
-			}
-		}
+		// } else if errors.IsAlreadyExists(err) {
+		// 	secretFound := &corev1.Secret{}
+		// 	if err := r.Get(context.TODO(), types.NamespacedName{Name: secret.Name, Namespace: namespace.Name}, secretFound); err != nil {
+		// 		return reconcile.Result{}, err
+		// 	} else if err == nil {
+		// 		if !util.IsIntersectMap(secretData, secretFound.StringData) {
+		// 			secretFound.StringData = secretData
+		// 			if err := r.Update(context.TODO(), secretFound); err != nil {
+		// 				return reconcile.Result{}, err
+		// 			}
+		// 			log.Infof("Updated %s Secret", secretFound.Name)
+		// 		}
+		// 	}
 	}
 
 	labels["app.kubernetes.io/name"] = "argocd-cm"
@@ -146,7 +145,7 @@ g, ` + username + `, ` + userRole + `
 		if err := r.Get(context.TODO(), types.NamespacedName{Name: configmap.Name, Namespace: namespace.Name}, configmapFound); err != nil {
 			return reconcile.Result{}, err
 		} else if err == nil {
-			if !reflect.DeepEqual(configMapData, configmapFound.Data) {
+			if !util.IsIntersectMap(configMapData, configmapFound.Data) {
 				configmapFound.Data = configMapData
 				if err := r.Update(context.TODO(), configmapFound); err != nil {
 					return reconcile.Result{}, err
@@ -187,23 +186,22 @@ g, ` + username + `, ` + userRole + `
 		return reconcile.Result{Requeue: true}, nil
 	}
 
-	time.Sleep(time.Duration(10) * time.Second)
-	adminToken, result, err := getAdminToken(workshop, namespace.Name, appsHostnameSuffix)
-	if err != nil {
-		return result, err
-	}
+	// adminToken, result, err := getAdminToken(workshop, namespace.Name, appsHostnameSuffix)
+	// if err != nil {
+	// 	return result, err
+	// }
 
-	if result, err := createRepository(workshop, adminToken, appsHostnameSuffix); err != nil {
-		return result, err
-	}
+	// if result, err := createRepository(workshop, adminToken, appsHostnameSuffix); err != nil {
+	// 	return result, err
+	// }
 
-	for id := 1; id <= users; id++ {
-		stagingProject := fmt.Sprintf("%s%d", workshop.Spec.Infrastructure.Project.StagingName, id)
+	// for id := 1; id <= users; id++ {
+	// 	stagingProject := fmt.Sprintf("%s%d", workshop.Spec.Infrastructure.Project.StagingName, id)
 
-		if result, err := createApplication(workshop, stagingProject, adminToken, appsHostnameSuffix); err != nil {
-			return result, err
-		}
-	}
+	// 	if result, err := createApplication(workshop, stagingProject, adminToken, appsHostnameSuffix); err != nil {
+	// 		return result, err
+	// 	}
+	// }
 
 	//Success
 	return reconcile.Result{}, nil
