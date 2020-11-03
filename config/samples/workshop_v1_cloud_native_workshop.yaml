@@ -8,7 +8,7 @@ spec:
     password: openshift
   source:
     gitURL: https://github.com/mcouliba/cloud-native-workshop
-    gitBranch: "ocp4.5"
+    gitBranch: "ocp4.6"
   infrastructure:
     argocd:
       enabled: true
@@ -19,7 +19,7 @@ spec:
       enabled: true
       image:
         name: quay.io/mcouliba/cloud-native-workshop-bookbag
-        tag: "ocp4.5"
+        tag: "ocp4.6"
     codeReadyWorkspace:
       enabled: true
       operatorHub:
