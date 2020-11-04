@@ -132,7 +132,7 @@ func (r *WorkshopReconciler) addUpdateUsernameDistribution(workshop *workshopv1.
 	}
 
 	// Create Route
-	route := kubernetes.NewRoute(workshop, r.Scheme, serviceName, workshop.Namespace, labels, serviceName, 8080)
+	route := kubernetes.NewSecuredRoute(workshop, r.Scheme, serviceName, workshop.Namespace, labels, serviceName, 8080)
 	if err := r.Create(context.TODO(), route); err != nil && !errors.IsAlreadyExists(err) {
 		return reconcile.Result{}, err
 	} else if err == nil {
