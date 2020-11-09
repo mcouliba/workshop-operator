@@ -22,10 +22,10 @@ import (
 
 	argocd "github.com/argoproj-labs/argocd-operator/pkg/apis/argoproj/v1alpha1"
 	che "github.com/eclipse/che-operator/pkg/apis/org/v1"
+	maistrav1 "github.com/maistra/istio-operator/pkg/apis/maistra/v1"
+	maistrav2 "github.com/maistra/istio-operator/pkg/apis/maistra/v2"
 	workshopv1 "github.com/mcouliba/workshop-operator/api/v1"
 	"github.com/mcouliba/workshop-operator/common/gitea"
-	smcp "github.com/mcouliba/workshop-operator/common/maistra/servicemeshcontrolplane"
-	smmr "github.com/mcouliba/workshop-operator/common/maistra/servicemeshmemberroll"
 	"github.com/mcouliba/workshop-operator/common/nexus"
 	"github.com/mcouliba/workshop-operator/controllers"
 
@@ -59,8 +59,8 @@ func init() {
 
 	utilruntime.Must(gitea.AddToScheme(scheme))
 	utilruntime.Must(nexus.AddToScheme(scheme))
-	utilruntime.Must(smcp.AddToScheme(scheme))
-	utilruntime.Must(smmr.AddToScheme(scheme))
+	utilruntime.Must(maistrav1.SchemeBuilder.AddToScheme(scheme))
+	utilruntime.Must(maistrav2.SchemeBuilder.AddToScheme(scheme))
 	utilruntime.Must(argocd.SchemeBuilder.AddToScheme(scheme))
 	utilruntime.Must(che.SchemeBuilder.AddToScheme(scheme))
 

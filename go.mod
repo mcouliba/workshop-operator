@@ -7,9 +7,8 @@ require (
 	github.com/eclipse/che-operator v0.0.0-20191211154745-df0be398efea
 	github.com/go-logr/logr v0.1.0
 	github.com/go-openapi/spec v0.19.9 // indirect
-	github.com/onsi/ginkgo v1.14.1 // indirect
-	github.com/onsi/gomega v1.10.2 // indirect
-	github.com/openshift/api v3.9.1-0.20190916204813-cdbe64fb0c91+incompatible
+	github.com/maistra/istio-operator v0.0.0-20201103161300-64d0fff69dbe
+	github.com/openshift/api v3.9.1-0.20190924102528-32369d4db2ad+incompatible
 	github.com/operator-framework/api v0.3.17
 	github.com/prometheus/common v0.14.0
 	golang.org/x/crypto v0.0.0-20201002170205-7f63de1d35b0
@@ -22,3 +21,5 @@ require (
 )
 
 replace k8s.io/client-go => k8s.io/client-go v0.18.9
+
+replace bitbucket.org/ww/goautoneg => github.com/munnerz/goautoneg v0.0.0-20120707110453-a547fc61f48d

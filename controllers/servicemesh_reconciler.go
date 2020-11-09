@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"reflect"
 
+	maistrav1 "github.com/maistra/istio-operator/pkg/apis/maistra/v1"
 	workshopv1 "github.com/mcouliba/workshop-operator/api/v1"
 	"github.com/mcouliba/workshop-operator/common/kubernetes"
-	smcp "github.com/mcouliba/workshop-operator/common/maistra/servicemeshcontrolplane"
-	smmr "github.com/mcouliba/workshop-operator/common/maistra/servicemeshmemberroll"
+	"github.com/mcouliba/workshop-operator/common/maistra"
 	"github.com/mcouliba/workshop-operator/common/util"
 	"github.com/prometheus/common/log"
 
@@ -48,11 +48,13 @@ func (r *WorkshopReconciler) reconcileServiceMesh(workshop *workshopv1.Workshop,
 
 func (r *WorkshopReconciler) addServiceMesh(workshop *workshopv1.Workshop, users int) (reconcile.Result, error) {
 
+	operatorNamespace := "openshift-operators"
+
 	// Service Mesh Operator
 	channel := workshop.Spec.Infrastructure.ServiceMesh.ServiceMeshOperatorHub.Channel
 	clusterserviceversion := workshop.Spec.Infrastructure.ServiceMesh.ServiceMeshOperatorHub.ClusterServiceVersion
 
-	subscription := kubernetes.NewRedHatSubscription(workshop, r.Scheme, "servicemeshoperator", "openshift-operators",
+	subscription := kubernetes.NewRedHatSubscription(workshop, r.Scheme, "servicemeshoperator", operatorNamespace,
 		"servicemeshoperator", channel, clusterserviceversion)
 	if err := r.Create(context.TODO(), subscription); err != nil && !errors.IsAlreadyExists(err) {
 		return reconcile.Result{}, err
@@ -60,13 +62,13 @@ func (r *WorkshopReconciler) addServiceMesh(workshop *workshopv1.Workshop, users
 		log.Infof("Created %s Subscription", subscription.Name)
 	}
 
-	if err := r.ApproveInstallPlan(clusterserviceversion, "servicemeshoperator", "openshift-operators"); err != nil {
+	if err := r.ApproveInstallPlan(clusterserviceversion, "servicemeshoperator", operatorNamespace); err != nil {
 		log.Infof("Waiting for Subscription to create InstallPlan for %s", subscription.Name)
 		return reconcile.Result{Requeue: true}, nil
 	}
 
 	// Wait for Operator to be running
-	if !kubernetes.GetK8Client().GetDeploymentStatus("istio-operator", "openshift-operators") {
+	if !kubernetes.GetK8Client().GetDeploymentStatus("istio-operator", operatorNamespace) {
 		return reconcile.Result{Requeue: true}, nil
 	}
 
@@ -107,34 +109,34 @@ func (r *WorkshopReconciler) addServiceMesh(workshop *workshopv1.Workshop, users
 		"app.kubernetes.io/part-of": "istio",
 	}
 
-	jaegerRole := kubernetes.NewRole(workshop, r.Scheme,
-		"workshop-jaeger", "istio-system", labels, kubernetes.JaegerUserRules())
-	if err := r.Create(context.TODO(), jaegerRole); err != nil && !errors.IsAlreadyExists(err) {
-		return reconcile.Result{}, err
-	} else if err == nil {
-		log.Infof("Created %s Role", jaegerRole.Name)
-	}
+	// jaegerRole := kubernetes.NewRole(workshop, r.Scheme,
+	// 	"workshop-jaeger", "istio-system", labels, kubernetes.JaegerUserRules())
+	// if err := r.Create(context.TODO(), jaegerRole); err != nil && !errors.IsAlreadyExists(err) {
+	// 	return reconcile.Result{}, err
+	// } else if err == nil {
+	// 	log.Infof("Created %s Role", jaegerRole.Name)
+	// }
 
-	jaegerRoleBinding := kubernetes.NewRoleBindingUsers(workshop, r.Scheme,
-		"workshop-jaeger", "istio-system", labels, istioUsers, jaegerRole.Name, "Role")
-	if err := r.Create(context.TODO(), jaegerRoleBinding); err != nil && !errors.IsAlreadyExists(err) {
-		return reconcile.Result{}, err
-	} else if err == nil {
-		log.Infof("Created %s Role Binding", jaegerRoleBinding.Name)
-	} else if errors.IsAlreadyExists(err) {
-		found := &rbac.RoleBinding{}
-		if err := r.Get(context.TODO(), types.NamespacedName{Name: jaegerRoleBinding.Name, Namespace: istioSystemNamespace.Name}, found); err != nil {
-			return reconcile.Result{}, err
-		} else if err == nil {
-			if !reflect.DeepEqual(istioUsers, found.Subjects) {
-				found.Subjects = istioUsers
-				if err := r.Update(context.TODO(), found); err != nil {
-					return reconcile.Result{}, err
-				}
-				log.Infof("Updated %s Role Binding", found.Name)
-			}
-		}
-	}
+	// jaegerRoleBinding := kubernetes.NewRoleBindingUsers(workshop, r.Scheme,
+	// 	"workshop-jaeger", "istio-system", labels, istioUsers, jaegerRole.Name, "Role")
+	// if err := r.Create(context.TODO(), jaegerRoleBinding); err != nil && !errors.IsAlreadyExists(err) {
+	// 	return reconcile.Result{}, err
+	// } else if err == nil {
+	// 	log.Infof("Created %s Role Binding", jaegerRoleBinding.Name)
+	// } else if errors.IsAlreadyExists(err) {
+	// 	found := &rbac.RoleBinding{}
+	// 	if err := r.Get(context.TODO(), types.NamespacedName{Name: jaegerRoleBinding.Name, Namespace: istioSystemNamespace.Name}, found); err != nil {
+	// 		return reconcile.Result{}, err
+	// 	} else if err == nil {
+	// 		if !reflect.DeepEqual(istioUsers, found.Subjects) {
+	// 			found.Subjects = istioUsers
+	// 			if err := r.Update(context.TODO(), found); err != nil {
+	// 				return reconcile.Result{}, err
+	// 			}
+	// 			log.Infof("Updated %s Role Binding", found.Name)
+	// 		}
+	// 	}
+	// }
 
 	meshUserRoleBinding := kubernetes.NewRoleBindingUsers(workshop, r.Scheme,
 		"mesh-users", "istio-system", labels, istioUsers, "mesh-user", "Role")
@@ -145,22 +147,21 @@ func (r *WorkshopReconciler) addServiceMesh(workshop *workshopv1.Workshop, users
 		log.Infof("Created %s Role Binding", meshUserRoleBinding.Name)
 	}
 
-	serviceMeshControlPlaneCR := smcp.NewServiceMeshControlPlaneCR(workshop, r.Scheme,
-		"full-install", istioSystemNamespace.Name)
+	serviceMeshControlPlaneCR := maistra.NewServiceMeshControlPlaneCR(workshop, r.Scheme, "basic", istioSystemNamespace.Name)
 	if err := r.Create(context.TODO(), serviceMeshControlPlaneCR); err != nil && !errors.IsAlreadyExists(err) {
 		return reconcile.Result{}, err
 	} else if err == nil {
 		log.Infof("Created %s Custom Resource", serviceMeshControlPlaneCR.Name)
 	}
 
-	serviceMeshMemberRollCR := smmr.NewServiceMeshMemberRollCR(workshop, r.Scheme,
+	serviceMeshMemberRollCR := maistra.NewServiceMeshMemberRollCR(workshop, r.Scheme,
 		"default", istioSystemNamespace.Name, istioMembers)
 	if err := r.Create(context.TODO(), serviceMeshMemberRollCR); err != nil && !errors.IsAlreadyExists(err) {
 		return reconcile.Result{}, err
 	} else if err == nil {
 		log.Infof("Created %s Custom Resource", serviceMeshMemberRollCR.Name)
 	} else if errors.IsAlreadyExists(err) {
-		serviceMeshMemberRollCRFound := &smmr.ServiceMeshMemberRoll{}
+		serviceMeshMemberRollCRFound := &maistrav1.ServiceMeshMemberRoll{}
 		if err := r.Get(context.TODO(), types.NamespacedName{Name: serviceMeshMemberRollCR.Name, Namespace: istioSystemNamespace.Name}, serviceMeshMemberRollCRFound); err != nil {
 			return reconcile.Result{}, err
 		} else if err == nil {
