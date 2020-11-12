@@ -1,0 +1,744 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    control-plane: controller-manager
+  name: workshop-infra
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.3.0
+  creationTimestamp: null
+  name: workshops.workshop.mcouliba.com
+spec:
+  group: workshop.mcouliba.com
+  names:
+    kind: Workshop
+    listKind: WorkshopList
+    plural: workshops
+    singular: workshop
+  scope: Namespaced
+  subresources:
+    status: {}
+  validation:
+    openAPIV3Schema:
+      description: Workshop is the Schema for the workshops API
+      properties:
+        apiVersion:
+          description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+          type: string
+        kind:
+          description: 'Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+          type: string
+        metadata:
+          type: object
+        spec:
+          description: WorkshopSpec defines the desired state of Workshop
+          properties:
+            infrastructure:
+              description: InfrastructureSpec ...
+              properties:
+                argocd:
+                  description: ArgoCDSpec ...
+                  properties:
+                    enabled:
+                      type: boolean
+                    operatorHub:
+                      description: OperatorHubSpec ...
+                      properties:
+                        channel:
+                          type: string
+                        clusterServiceVersion:
+                          type: string
+                      required:
+                      - channel
+                      type: object
+                  required:
+                  - enabled
+                  - operatorHub
+                  type: object
+                bookbag:
+                  description: BookbagSpec ...
+                  properties:
+                    enabled:
+                      type: boolean
+                    image:
+                      description: ImageSpec ...
+                      properties:
+                        name:
+                          type: string
+                        tag:
+                          type: string
+                      required:
+                      - name
+                      - tag
+                      type: object
+                  required:
+                  - enabled
+                  - image
+                  type: object
+                certManager:
+                  description: CertManagerSpec ...
+                  properties:
+                    enabled:
+                      type: boolean
+                    operatorHub:
+                      description: OperatorHubSpec ...
+                      properties:
+                        channel:
+                          type: string
+                        clusterServiceVersion:
+                          type: string
+                      required:
+                      - channel
+                      type: object
+                  required:
+                  - enabled
+                  - operatorHub
+                  type: object
+                codeReadyWorkspace:
+                  description: CodeReadyWorkspaceSpec ...
+                  properties:
+                    enabled:
+                      type: boolean
+                    openshiftOAuth:
+                      type: boolean
+                    operatorHub:
+                      description: OperatorHubSpec ...
+                      properties:
+                        channel:
+                          type: string
+                        clusterServiceVersion:
+                          type: string
+                      required:
+                      - channel
+                      type: object
+                    pluginRegistryImage:
+                      description: ImageSpec ...
+                      properties:
+                        name:
+                          type: string
+                        tag:
+                          type: string
+                      required:
+                      - name
+                      - tag
+                      type: object
+                  required:
+                  - enabled
+                  - openshiftOAuth
+                  - operatorHub
+                  - pluginRegistryImage
+                  type: object
+                gitea:
+                  description: GiteaSpec ...
+                  properties:
+                    enabled:
+                      type: boolean
+                    image:
+                      description: ImageSpec ...
+                      properties:
+                        name:
+                          type: string
+                        tag:
+                          type: string
+                      required:
+                      - name
+                      - tag
+                      type: object
+                  required:
+                  - enabled
+                  - image
+                  type: object
+                istioWorkspace:
+                  description: IstioWorkspaceSpec ...
+                  properties:
+                    enabled:
+                      type: boolean
+                    image:
+                      description: ImageSpec ...
+                      properties:
+                        name:
+                          type: string
+                        tag:
+                          type: string
+                      required:
+                      - name
+                      - tag
+                      type: object
+                  required:
+                  - enabled
+                  - image
+                  type: object
+                nexus:
+                  description: NexusSpec ...
+                  properties:
+                    enabled:
+                      type: boolean
+                  required:
+                  - enabled
+                  type: object
+                pipeline:
+                  description: PipelineSpec ...
+                  properties:
+                    enabled:
+                      type: boolean
+                    operatorHub:
+                      description: OperatorHubSpec ...
+                      properties:
+                        channel:
+                          type: string
+                        clusterServiceVersion:
+                          type: string
+                      required:
+                      - channel
+                      type: object
+                  required:
+                  - enabled
+                  - operatorHub
+                  type: object
+                project:
+                  description: ProjectSpec ...
+                  properties:
+                    enabled:
+                      type: boolean
+                    stagingName:
+                      type: string
+                  required:
+                  - enabled
+                  - stagingName
+                  type: object
+                serverless:
+                  description: ServerlessSpec ...
+                  properties:
+                    enabled:
+                      type: boolean
+                    operatorHub:
+                      description: OperatorHubSpec ...
+                      properties:
+                        channel:
+                          type: string
+                        clusterServiceVersion:
+                          type: string
+                      required:
+                      - channel
+                      type: object
+                  required:
+                  - enabled
+                  - operatorHub
+                  type: object
+                serviceMesh:
+                  description: ServiceMeshSpec ...
+                  properties:
+                    elasticSearchOperatorHub:
+                      description: OperatorHubSpec ...
+                      properties:
+                        channel:
+                          type: string
+                        clusterServiceVersion:
+                          type: string
+                      required:
+                      - channel
+                      type: object
+                    enabled:
+                      type: boolean
+                    jaegerOperatorHub:
+                      description: OperatorHubSpec ...
+                      properties:
+                        channel:
+                          type: string
+                        clusterServiceVersion:
+                          type: string
+                      required:
+                      - channel
+                      type: object
+                    kialiOperatorHub:
+                      description: OperatorHubSpec ...
+                      properties:
+                        channel:
+                          type: string
+                        clusterServiceVersion:
+                          type: string
+                      required:
+                      - channel
+                      type: object
+                    serviceMeshOperatorHub:
+                      description: OperatorHubSpec ...
+                      properties:
+                        channel:
+                          type: string
+                        clusterServiceVersion:
+                          type: string
+                      required:
+                      - channel
+                      type: object
+                  required:
+                  - elasticSearchOperatorHub
+                  - enabled
+                  - jaegerOperatorHub
+                  - kialiOperatorHub
+                  - serviceMeshOperatorHub
+                  type: object
+                vault:
+                  description: VaultSpec ...
+                  properties:
+                    agentInjectorImage:
+                      description: ImageSpec ...
+                      properties:
+                        name:
+                          type: string
+                        tag:
+                          type: string
+                      required:
+                      - name
+                      - tag
+                      type: object
+                    enabled:
+                      type: boolean
+                    image:
+                      description: ImageSpec ...
+                      properties:
+                        name:
+                          type: string
+                        tag:
+                          type: string
+                      required:
+                      - name
+                      - tag
+                      type: object
+                  required:
+                  - agentInjectorImage
+                  - enabled
+                  - image
+                  type: object
+              type: object
+            source:
+              description: SourceSpec ...
+              properties:
+                gitBranch:
+                  type: string
+                gitURL:
+                  type: string
+              required:
+              - gitBranch
+              - gitURL
+              type: object
+            user:
+              description: UserSpec ...
+              properties:
+                number:
+                  type: integer
+                password:
+                  type: string
+              required:
+              - number
+              - password
+              type: object
+          required:
+          - infrastructure
+          - source
+          - user
+          type: object
+        status:
+          description: WorkshopStatus defines the observed state of Workshop
+          properties:
+            argocd:
+              type: string
+            bookbag:
+              type: string
+            certManager:
+              type: string
+            codeReadyWorkspace:
+              type: string
+            gitea:
+              type: string
+            istioWorkspace:
+              type: string
+            nexus:
+              type: string
+            pipeline:
+              type: string
+            project:
+              type: string
+            serverless:
+              type: string
+            serviceMesh:
+              type: string
+            usernameDistribution:
+              type: string
+            vault:
+              type: string
+          required:
+          - argocd
+          - bookbag
+          - certManager
+          - codeReadyWorkspace
+          - gitea
+          - istioWorkspace
+          - nexus
+          - pipeline
+          - project
+          - serverless
+          - serviceMesh
+          - usernameDistribution
+          - vault
+          type: object
+      type: object
+  version: v1
+  versions:
+  - name: v1
+    served: true
+    storage: true
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: workshop-operator-leader-election-role
+  namespace: workshop-infra
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - ""
+  resources:
+  - configmaps/status
+  verbs:
+  - get
+  - update
+  - patch
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+  - patch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  creationTimestamp: null
+  name: workshop-operator-manager-role
+rules:
+- apiGroups:
+  - admissionregistration.k8s.io
+  resources:
+  - mutatingwebhookconfigurations
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - apiextensions.k8s.io
+  resources:
+  - customresourcedefinitions
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - apps
+  resources:
+  - deployments
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - apps
+  resources:
+  - deployments/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - argoproj.io
+  resources:
+  - argocds
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  - endpoints
+  - events
+  - namespaces
+  - persistentvolumeclaims
+  - pods
+  - secrets
+  - serviceaccounts
+  - services
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - gpte.opentlc.com
+  resources:
+  - giteas
+  - nexus
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - maistra.io
+  resources:
+  - servicemeshcontrolplanes
+  - servicemeshmemberrolls
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - operators.coreos.com
+  resources:
+  - clusterserviceversions
+  - installplans
+  - operatorgroups
+  - subscriptions
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - org.eclipse.che
+  resources:
+  - checlusters
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - project.openshift.io
+  resources:
+  - projectrequests
+  verbs:
+  - create
+- apiGroups:
+  - rbac.authorization.k8s.io
+  resources:
+  - clusterrolebindings
+  - clusterroles
+  - rolebindings
+  - roles
+  verbs:
+  - '*'
+- apiGroups:
+  - route.openshift.io
+  resources:
+  - routes
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - security.openshift.io
+  resources:
+  - securitycontextconstraints
+  verbs:
+  - list
+  - update
+  - watch
+- apiGroups:
+  - workshop.mcouliba.com
+  resources:
+  - workshops
+  - workshops/finalizers
+  verbs:
+  - '*'
+- apiGroups:
+  - workshop.mcouliba.com
+  resources:
+  - workshops/status
+  verbs:
+  - get
+  - patch
+  - update
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: workshop-operator-proxy-role
+rules:
+- apiGroups:
+  - authentication.k8s.io
+  resources:
+  - tokenreviews
+  verbs:
+  - create
+- apiGroups:
+  - authorization.k8s.io
+  resources:
+  - subjectaccessreviews
+  verbs:
+  - create
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  name: workshop-operator-metrics-reader
+rules:
+- nonResourceURLs:
+  - /metrics
+  verbs:
+  - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: workshop-operator-leader-election-rolebinding
+  namespace: workshop-infra
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: workshop-operator-leader-election-role
+subjects:
+- kind: ServiceAccount
+  name: default
+  namespace: workshop-infra
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: workshop-operator-manager-rolebinding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: workshop-operator-manager-role
+subjects:
+- kind: ServiceAccount
+  name: default
+  namespace: workshop-infra
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: workshop-operator-proxy-rolebinding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: workshop-operator-proxy-role
+subjects:
+- kind: ServiceAccount
+  name: default
+  namespace: workshop-infra
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    control-plane: controller-manager
+  name: workshop-operator-controller-manager-metrics-service
+  namespace: workshop-infra
+spec:
+  ports:
+  - name: https
+    port: 8443
+    targetPort: https
+  selector:
+    control-plane: controller-manager
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    control-plane: controller-manager
+  name: workshop-operator-controller-manager
+  namespace: workshop-infra
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      control-plane: controller-manager
+  template:
+    metadata:
+      labels:
+        control-plane: controller-manager
+    spec:
+      containers:
+      - args:
+        - --secure-listen-address=0.0.0.0:8443
+        - --upstream=http://127.0.0.1:8080/
+        - --logtostderr=true
+        - --v=10
+        image: gcr.io/kubebuilder/kube-rbac-proxy:v0.5.0
+        name: kube-rbac-proxy
+        ports:
+        - containerPort: 8443
+          name: https
+      - args:
+        - --metrics-addr=127.0.0.1:8080
+        - --enable-leader-election
+        command:
+        - /manager
+        image: quay.io/mcouliba/workshop-operator:ocp4.6
+        name: manager
+        resources:
+          limits:
+            cpu: 100m
+            memory: 256Mi
+          requests:
+            cpu: 100m
+            memory: 256Mi
+      terminationGracePeriodSeconds: 10
