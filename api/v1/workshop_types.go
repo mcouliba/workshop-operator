@@ -48,10 +48,10 @@ type SourceSpec struct {
 // InfrastructureSpec ...
 type InfrastructureSpec struct {
 	ArgoCD             ArgoCDSpec             `json:"argocd,omitempty"`
-	Bookbag            BookbagSpec            `json:"bookbag,omitempty"`
 	CertManager        CertManagerSpec        `json:"certManager,omitempty"`
 	CodeReadyWorkspace CodeReadyWorkspaceSpec `json:"codeReadyWorkspace,omitempty"`
 	Gitea              GiteaSpec              `json:"gitea,omitempty"`
+	Guide              GuideSpec              `json:"guide,omitempty"`
 	IstioWorkspace     IstioWorkspaceSpec     `json:"istioWorkspace,omitempty"`
 	Nexus              NexusSpec              `json:"nexus,omitempty"`
 	Pipeline           PipelineSpec           `json:"pipeline,omitempty"`
@@ -85,6 +85,12 @@ type GiteaSpec struct {
 	Image   ImageSpec `json:"image"`
 }
 
+// GuideSpec ...
+type GuideSpec struct {
+	Bookbag  BookbagSpec  `json:"bookbag,omitempty"`
+	Scholars ScholarsSpec `json:"scholars,omitempty"`
+}
+
 // NexusSpec ...
 type NexusSpec struct {
 	Enabled bool `json:"enabled"`
@@ -100,6 +106,12 @@ type PipelineSpec struct {
 type ProjectSpec struct {
 	Enabled     bool   `json:"enabled"`
 	StagingName string `json:"stagingName"`
+}
+
+// ScholarsSpec ...
+type ScholarsSpec struct {
+	Enabled  bool   `json:"enabled"`
+	GuideURL string `json:"guideURL"`
 }
 
 // ServiceMeshSpec ...

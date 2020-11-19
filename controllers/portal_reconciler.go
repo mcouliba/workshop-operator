@@ -102,7 +102,7 @@ func (r *WorkshopReconciler) addUpdateUsernameDistribution(workshop *workshopv1.
 	}
 
 	// Deploy/Update UsernameDistribution
-	dep := usernamedistribution.NewDeployment(workshop, r.Scheme, serviceName, labels, redisServiceName, users, appsHostnameSuffix)
+	dep := usernamedistribution.NewDeployment(workshop, r.Scheme, serviceName, labels, redisServiceName, users, appsHostnameSuffix, openshiftConsoleURL)
 	if err := r.Create(context.TODO(), dep); err != nil && !errors.IsAlreadyExists(err) {
 		return reconcile.Result{}, err
 	} else if err == nil {

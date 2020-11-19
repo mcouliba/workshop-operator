@@ -3,7 +3,7 @@ kind: Workshop
 metadata:
   name: cloud-native-workshop
 spec:
-  user: 
+  user:
     number: 5
     password: openshift
   source:
@@ -15,11 +15,15 @@ spec:
       operatorHub:
         channel: alpha
         clusterServiceVersion: argocd-operator.v0.0.14
-    bookbag:
-      enabled: true
-      image:
-        name: quay.io/mcouliba/cloud-native-workshop-bookbag
-        tag: "ocp4.6"
+    guide:
+      bookbag:
+        enabled: true
+        image:
+          name: quay.io/mcouliba/cloud-native-workshop-bookbag
+          tag: "ocp4.6"
+      scholars:
+        enabled: true
+        guideURL: "https://redhat-scholars.github.io/inner-loop-guide/inner-loop/index.html" 
     codeReadyWorkspace:
       enabled: true
       operatorHub:

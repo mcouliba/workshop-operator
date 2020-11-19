@@ -2,6 +2,7 @@ package usernamedistribution
 
 import (
 	"fmt"
+	"net/url"
 	"strconv"
 
 	workshopv1 "github.com/mcouliba/workshop-operator/api/v1"
@@ -14,9 +15,20 @@ import (
 
 // NewDeployment create a deployment
 func NewDeployment(workshop *workshopv1.Workshop, scheme *runtime.Scheme,
-	name string, labels map[string]string, redisServiceName string, users int, appsHostnameSuffix string) *appsv1.Deployment {
+	name string, labels map[string]string, redisServiceName string, users int,
+	appsHostnameSuffix string, openshiftConsoleURL string) *appsv1.Deployment {
 
-	image := "quay.io/mcouliba/username-distribution:1.3"
+	image := "quay.io/mcouliba/username-distribution:latest"
+	guideURL := fmt.Sprintf("http://%%USERNAME%%-bookbag-workshop-guides.%s/workshop", appsHostnameSuffix)
+
+	if workshop.Spec.Infrastructure.Guide.Scholars.Enabled {
+		guideURL = workshop.Spec.Infrastructure.Guide.Scholars.GuideURL + "?" +
+			"APPS_HOSTNAME_SUFFIX=" + appsHostnameSuffix +
+			"&USER_ID=%USERID%" +
+			"&OPENSHIFT_PASSWORD=" + workshop.Spec.User.Password +
+			"&WORKSHOP_GIT_REPO=" + url.QueryEscape(workshop.Spec.Source.GitURL) +
+			"&WORKSHOP_GIT_REF=" + workshop.Spec.Source.GitBranch
+	}
 
 	dep := &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
@@ -80,7 +92,7 @@ func NewDeployment(workshop *workshopv1.Workshop, scheme *runtime.Scheme,
 								},
 								{
 									Name:  "LAB_MODULE_URLS",
-									Value: fmt.Sprintf("http://%%USERNAME%%-bookbag-workshop-guides.%s/workshop", appsHostnameSuffix) + ";" + workshop.Name,
+									Value: guideURL + ";" + workshop.Name,
 								},
 							},
 							Image:           image,

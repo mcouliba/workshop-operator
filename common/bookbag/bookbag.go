@@ -17,7 +17,7 @@ func NewDeployment(workshop *workshopv1.Workshop, scheme *runtime.Scheme,
 	userID string, appsHostnameSuffix string, openshiftConsoleURL string) *appsv1.Deployment {
 
 	user := fmt.Sprintf("user%s", userID)
-	image := workshop.Spec.Infrastructure.Bookbag.Image.Name + ":" + workshop.Spec.Infrastructure.Bookbag.Image.Tag
+	image := workshop.Spec.Infrastructure.Guide.Bookbag.Image.Name + ":" + workshop.Spec.Infrastructure.Guide.Bookbag.Image.Tag
 	consoleImage := "quay.io/openshift/origin-console:4.2"
 
 	vars := `{

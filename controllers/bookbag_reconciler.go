@@ -23,7 +23,7 @@ import (
 // Reconciling Bookbag
 func (r *WorkshopReconciler) reconcileBookbag(workshop *workshopv1.Workshop, users int,
 	appsHostnameSuffix string, openshiftConsoleURL string) (reconcile.Result, error) {
-	enabled := workshop.Spec.Infrastructure.Bookbag.Enabled
+	enabled := workshop.Spec.Infrastructure.Guide.Bookbag.Enabled
 
 	guidesNamespace := "workshop-guides"
 
