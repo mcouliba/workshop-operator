@@ -24,7 +24,7 @@ func NewDeployment(workshop *workshopv1.Workshop, scheme *runtime.Scheme,
 	if workshop.Spec.Infrastructure.Guide.Scholars.Enabled {
 		guideURL = workshop.Spec.Infrastructure.Guide.Scholars.GuideURL + "?" +
 			"APPS_HOSTNAME_SUFFIX=" + appsHostnameSuffix +
-			"&USER_ID=%USERID%" +
+			"&USER_ID=%USER_ID%" +
 			"&OPENSHIFT_PASSWORD=" + workshop.Spec.User.Password +
 			"&WORKSHOP_GIT_REPO=" + url.QueryEscape(workshop.Spec.Source.GitURL) +
 			"&WORKSHOP_GIT_REF=" + workshop.Spec.Source.GitBranch
