@@ -16,11 +16,6 @@ spec:
         channel: alpha
         clusterServiceVersion: argocd-operator.v0.0.14
     guide:
-      bookbag:
-        enabled: true
-        image:
-          name: quay.io/mcouliba/cloud-native-workshop-bookbag
-          tag: "ocp4.6"
       scholars:
         enabled: true
         guideURL: "https://redhat-scholars.github.io/inner-loop-guide/inner-loop/index.html" 
@@ -28,11 +23,11 @@ spec:
       enabled: true
       operatorHub:
         channel: latest
-        clusterServiceVersion: crwoperator.v2.4.0
+        clusterServiceVersion: crwoperator.v2.5.0
       openshiftOAuth: false
       pluginRegistryImage:
         name: quay.io/mcouliba/che-plugin-registry
-        tag: "2.4.0.GA"
+        tag: "2.5.0"
     gitea:
       enabled: true
       image:
@@ -52,9 +47,9 @@ spec:
       enabled: true
       serviceMeshOperatorHub:
         channel: "stable"
-        clusterServiceVersion: servicemeshoperator.v2.0.0
+        clusterServiceVersion: servicemeshoperator.v2.0.0.2
       elasticSearchOperatorHub:
-        channel: "4.5"
+        channel: "4.6"
       jaegerOperatorHub:
         channel: "stable"
       kialiOperatorHub:

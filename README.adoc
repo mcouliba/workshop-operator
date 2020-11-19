@@ -37,8 +37,7 @@ Perform the following tasks:
 [source,bash]
 ----
 oc new-project workshop-infra
-make install
-make deploy IMG=quay.io/mcouliba/workshop-operator:ocp4.6
+oc apply -f config/deploy/workshop_operator_deployment.yaml
 ----
 
 == Install the Workshop Infrastructure
