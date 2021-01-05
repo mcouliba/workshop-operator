@@ -23,7 +23,7 @@ spec:
       enabled: true
       operatorHub:
         channel: latest
-        clusterServiceVersion: crwoperator.v2.5.0
+        clusterServiceVersion: crwoperator.v2.5.1
       openshiftOAuth: false
       pluginRegistryImage:
         name: quay.io/mcouliba/che-plugin-registry
@@ -39,7 +39,7 @@ spec:
       enabled: true
       operatorHub:
         channel: preview
-        clusterServiceVersion: redhat-openshift-pipelines-operator.v1.2.0
+        clusterServiceVersion: redhat-openshift-pipelines-operator.v1.2.2
     project:
       enabled: true
       stagingName: cn-project
@@ -47,11 +47,11 @@ spec:
       enabled: true
       serviceMeshOperatorHub:
         channel: "stable"
-        clusterServiceVersion: servicemeshoperator.v2.0.0.2
+        clusterServiceVersion: servicemeshoperator.v2.0.1
       elasticSearchOperatorHub:
         channel: "4.6"
       jaegerOperatorHub:
         channel: "stable"
       kialiOperatorHub:
         channel: "stable"
-        clusterServiceVersion: kiali-operator.v1.24.2
+        clusterServiceVersion: kiali-operator.v1.24.3

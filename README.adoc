@@ -37,7 +37,7 @@ Perform the following tasks:
 [source,bash]
 ----
 oc new-project workshop-infra
-oc apply -f config/deploy/workshop_operator_deployment.yaml
+oc apply -f https://raw.githubusercontent.com/mcouliba/workshop-operator/ocp4.6/config/deploy/workshop_operator_deployment.yaml
 ----
 
 == Install the Workshop Infrastructure
