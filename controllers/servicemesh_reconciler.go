@@ -151,7 +151,7 @@ func (r *WorkshopReconciler) addServiceMesh(workshop *workshopv1.Workshop, users
 	if err := r.Create(context.TODO(), serviceMeshControlPlaneCR); err != nil && !errors.IsAlreadyExists(err) {
 		return reconcile.Result{}, err
 	} else if err == nil {
-		log.Infof("Created %s Custom Resource", serviceMeshControlPlaneCR.Name)
+		log.Infof("Created %s Service Mesh Control Plane Custom Resource", serviceMeshControlPlaneCR.Name)
 	}
 
 	serviceMeshMemberRollCR := maistra.NewServiceMeshMemberRollCR(workshop, r.Scheme,
@@ -170,7 +170,7 @@ func (r *WorkshopReconciler) addServiceMesh(workshop *workshopv1.Workshop, users
 				if err := r.Update(context.TODO(), serviceMeshMemberRollCRFound); err != nil {
 					return reconcile.Result{}, err
 				}
-				log.Infof("Updated %s Custom Resource", serviceMeshMemberRollCRFound.Name)
+				log.Infof("Updated %s Service Mesh Member Roll Custom Resource", serviceMeshMemberRollCRFound.Name)
 			}
 		}
 	}

@@ -39,7 +39,7 @@ spec:
       enabled: true
       operatorHub:
         channel: preview
-        clusterServiceVersion: redhat-openshift-pipelines-operator.v1.2.2
+        clusterServiceVersion: redhat-openshift-pipelines-operator.v1.2.3
     project:
       enabled: true
       stagingName: cn-project
@@ -47,11 +47,11 @@ spec:
       enabled: true
       serviceMeshOperatorHub:
         channel: "stable"
-        clusterServiceVersion: servicemeshoperator.v2.0.1
+        clusterServiceVersion: servicemeshoperator.v2.0.1.1
       elasticSearchOperatorHub:
         channel: "4.6"
       jaegerOperatorHub:
         channel: "stable"
       kialiOperatorHub:
         channel: "stable"
-        clusterServiceVersion: kiali-operator.v1.24.3
+        clusterServiceVersion: kiali-operator.v1.24.4
