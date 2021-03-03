@@ -32,6 +32,10 @@ func NewCustomResource(workshop *workshopv1.Workshop, scheme *runtime.Scheme,
 	pluginRegistryImage := workshop.Spec.Infrastructure.CodeReadyWorkspace.PluginRegistryImage.Name +
 		":" + workshop.Spec.Infrastructure.CodeReadyWorkspace.PluginRegistryImage.Tag
 
+	if pluginRegistryImage == ":" {
+		pluginRegistryImage = ""
+	}
+
 	cr := &che.CheCluster{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "CheCluster",
