@@ -2,13 +2,14 @@ apiVersion: workshop.mcouliba.com/v1
 kind: Workshop
 metadata:
   name: cloud-native-workshop
+  namespace: workshop-infra
 spec:
   user:
     number: 5
     password: openshift
   source:
     gitURL: https://github.com/mcouliba/cloud-native-workshop
-    gitBranch: "ocp4.6"
+    gitBranch: "5.0"
   infrastructure:
     argocd:
       enabled: true
@@ -23,7 +24,7 @@ spec:
       enabled: true
       operatorHub:
         channel: latest
-        clusterServiceVersion: crwoperator.v2.5.1
+        clusterServiceVersion: crwoperator.v2.6.0
       openshiftOAuth: false
       pluginRegistryImage:
         name: quay.io/mcouliba/che-plugin-registry
@@ -47,11 +48,11 @@ spec:
       enabled: true
       serviceMeshOperatorHub:
         channel: "stable"
-        clusterServiceVersion: servicemeshoperator.v2.0.1.1
+        clusterServiceVersion: servicemeshoperator.v2.0.2.0
       elasticSearchOperatorHub:
-        channel: "4.6"
+        channel: "stable"
       jaegerOperatorHub:
         channel: "stable"
       kialiOperatorHub:
         channel: "stable"
-        clusterServiceVersion: kiali-operator.v1.24.4
+        clusterServiceVersion: kiali-operator.v1.24.5
