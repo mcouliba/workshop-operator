@@ -134,7 +134,7 @@ type CodeReadyWorkspaceSpec struct {
 	Enabled             bool            `json:"enabled"`
 	OperatorHub         OperatorHubSpec `json:"operatorHub"`
 	OpenshiftOAuth      bool            `json:"openshiftOAuth"`
-	PluginRegistryImage ImageSpec       `json:"pluginRegistryImage"`
+	PluginRegistryImage ImageSpec       `json:"pluginRegistryImage,omitempty"`
 }
 
 // IstioWorkspaceSpec ...

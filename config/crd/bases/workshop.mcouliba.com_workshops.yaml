@@ -109,7 +109,6 @@ spec:
                   - enabled
                   - openshiftOAuth
                   - operatorHub
-                  - pluginRegistryImage
                   type: object
                 gitea:
                   description: GiteaSpec ...

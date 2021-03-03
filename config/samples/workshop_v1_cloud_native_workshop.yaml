@@ -48,7 +48,7 @@ spec:
       enabled: true
       serviceMeshOperatorHub:
         channel: "stable"
-        clusterServiceVersion: servicemeshoperator.v2.0.2.0
+        clusterServiceVersion: servicemeshoperator.v2.0.2
       elasticSearchOperatorHub:
         channel: "stable"
       jaegerOperatorHub:
