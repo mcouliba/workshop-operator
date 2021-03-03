@@ -732,7 +732,7 @@ spec:
         - --enable-leader-election
         command:
         - /manager
-        image: quay.io/mcouliba/workshop-operator:ocp4.6
+        image: quay.io/mcouliba/workshop-operator:1.0
         name: manager
         resources:
           limits:

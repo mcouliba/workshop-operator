@@ -37,7 +37,7 @@ Perform the following tasks:
 [source,bash]
 ----
 oc new-project workshop-infra
-oc apply -f https://raw.githubusercontent.com/mcouliba/workshop-operator/ocp4.6/config/deploy/workshop_operator_deployment.yaml
+oc apply -f https://raw.githubusercontent.com/mcouliba/workshop-operator/1.0/config/deploy/workshop_operator_deployment.yaml
 ----
 
 == Install the Workshop Infrastructure
@@ -59,6 +59,6 @@ oc apply -n workshop-infra -f config/samples/workshop_v1_cloud_native_workshop.y
 
 [source,bash]
 ----
-make docker-build IMG=quay.io/mcouliba/workshop-operator:ocp4.6
-make docker-push IMG=quay.io/mcouliba/workshop-operator:ocp4.6
+make docker-build IMG=quay.io/mcouliba/workshop-operator
+make docker-push IMG=quay.io/mcouliba/workshop-operator
 ----
