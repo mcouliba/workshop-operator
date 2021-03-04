@@ -44,25 +44,6 @@ spec:
             infrastructure:
               description: InfrastructureSpec ...
               properties:
-                argocd:
-                  description: ArgoCDSpec ...
-                  properties:
-                    enabled:
-                      type: boolean
-                    operatorHub:
-                      description: OperatorHubSpec ...
-                      properties:
-                        channel:
-                          type: string
-                        clusterServiceVersion:
-                          type: string
-                      required:
-                      - channel
-                      type: object
-                  required:
-                  - enabled
-                  - operatorHub
-                  type: object
                 certManager:
                   description: CertManagerSpec ...
                   properties:
@@ -134,6 +115,25 @@ spec:
                   required:
                   - enabled
                   - image
+                  type: object
+                gitops:
+                  description: GitOpsSpec ...
+                  properties:
+                    enabled:
+                      type: boolean
+                    operatorHub:
+                      description: OperatorHubSpec ...
+                      properties:
+                        channel:
+                          type: string
+                        clusterServiceVersion:
+                          type: string
+                      required:
+                      - channel
+                      type: object
+                  required:
+                  - enabled
+                  - operatorHub
                   type: object
                 guide:
                   description: GuideSpec ...
@@ -362,8 +362,6 @@ spec:
         status:
           description: WorkshopStatus defines the observed state of Workshop
           properties:
-            argocd:
-              type: string
             bookbag:
               type: string
             certManager:
@@ -371,6 +369,8 @@ spec:
             codeReadyWorkspace:
               type: string
             gitea:
+              type: string
+            gitops:
               type: string
             istioWorkspace:
               type: string
@@ -389,11 +389,11 @@ spec:
             vault:
               type: string
           required:
-          - argocd
           - bookbag
           - certManager
           - codeReadyWorkspace
           - gitea
+          - gitops
           - istioWorkspace
           - nexus
           - pipeline

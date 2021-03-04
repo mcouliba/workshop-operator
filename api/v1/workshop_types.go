@@ -47,10 +47,10 @@ type SourceSpec struct {
 
 // InfrastructureSpec ...
 type InfrastructureSpec struct {
-	ArgoCD             ArgoCDSpec             `json:"argocd,omitempty"`
 	CertManager        CertManagerSpec        `json:"certManager,omitempty"`
 	CodeReadyWorkspace CodeReadyWorkspaceSpec `json:"codeReadyWorkspace,omitempty"`
 	Gitea              GiteaSpec              `json:"gitea,omitempty"`
+	GitOps             GitOpsSpec             `json:"gitops,omitempty"`
 	Guide              GuideSpec              `json:"guide,omitempty"`
 	IstioWorkspace     IstioWorkspaceSpec     `json:"istioWorkspace,omitempty"`
 	Nexus              NexusSpec              `json:"nexus,omitempty"`
@@ -59,12 +59,6 @@ type InfrastructureSpec struct {
 	ServiceMesh        ServiceMeshSpec        `json:"serviceMesh,omitempty"`
 	Serverless         ServerlessSpec         `json:"serverless,omitempty"`
 	Vault              VaultSpec              `json:"vault,omitempty"`
-}
-
-// ArgoCDSpec ...
-type ArgoCDSpec struct {
-	Enabled     bool            `json:"enabled"`
-	OperatorHub OperatorHubSpec `json:"operatorHub"`
 }
 
 // BookbagSpec ...
@@ -83,6 +77,12 @@ type CertManagerSpec struct {
 type GiteaSpec struct {
 	Enabled bool      `json:"enabled"`
 	Image   ImageSpec `json:"image"`
+}
+
+// GitOpsSpec ...
+type GitOpsSpec struct {
+	Enabled     bool            `json:"enabled"`
+	OperatorHub OperatorHubSpec `json:"operatorHub"`
 }
 
 // GuideSpec ...
@@ -167,11 +167,11 @@ type WorkshopStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 
-	ArgoCD               string `json:"argocd"`
 	Bookbag              string `json:"bookbag"`
 	CertManager          string `json:"certManager"`
 	CodeReadyWorkspace   string `json:"codeReadyWorkspace"`
 	Gitea                string `json:"gitea"`
+	GitOps               string `json:"gitops"`
 	IstioWorkspace       string `json:"istioWorkspace"`
 	Nexus                string `json:"nexus"`
 	Pipeline             string `json:"pipeline"`

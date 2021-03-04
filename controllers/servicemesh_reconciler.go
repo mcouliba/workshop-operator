@@ -83,7 +83,7 @@ func (r *WorkshopReconciler) addServiceMesh(workshop *workshopv1.Workshop, users
 	istioMembers := []string{}
 	istioUsers := []rbac.Subject{}
 
-	if workshop.Spec.Infrastructure.ArgoCD.Enabled {
+	if workshop.Spec.Infrastructure.GitOps.Enabled {
 		argocdSubject := rbac.Subject{
 			Kind:     rbac.UserKind,
 			Name:     "system:serviceaccount:argocd:argocd-application-controller",

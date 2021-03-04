@@ -11,11 +11,6 @@ spec:
     gitURL: https://github.com/mcouliba/cloud-native-workshop
     gitBranch: "5.0"
   infrastructure:
-    argocd:
-      enabled: true
-      operatorHub:
-        channel: alpha
-        clusterServiceVersion: argocd-operator.v0.0.14
     guide:
       scholars:
         enabled: true
@@ -26,21 +21,23 @@ spec:
         channel: latest
         clusterServiceVersion: crwoperator.v2.6.0
       openshiftOAuth: false
-      pluginRegistryImage:
-        name: quay.io/mcouliba/che-plugin-registry
-        tag: "2.5.0"
     gitea:
       enabled: true
       image:
         name: quay.io/gpte-devops-automation/gitea-operator
         tag: v0.17
+    gitops:
+      enabled: true
+      operatorHub:
+        channel: preview
+        clusterServiceVersion: openshift-gitops-operator.v1.0.1
     nexus:
       enabled: true
     pipeline:
       enabled: true
       operatorHub:
         channel: preview
-        clusterServiceVersion: redhat-openshift-pipelines-operator.v1.2.3
+        clusterServiceVersion: redhat-openshift-pipelines-operator.v1.3.0
     project:
       enabled: true
       stagingName: cn-project

@@ -172,7 +172,7 @@ func (r *WorkshopReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	//////////////////////////
 	// Pipeline
 	//////////////////////////
-	if result, err := r.reconcilePipeline(workshop); util.IsRequeued(result, err) {
+	if result, err := r.reconcilePipelines(workshop); util.IsRequeued(result, err) {
 		return result, err
 	}
 
@@ -184,9 +184,9 @@ func (r *WorkshopReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	}
 
 	//////////////////////////
-	// Argo CD
+	// GitOps
 	//////////////////////////
-	if result, err := r.reconcileArgoCD(workshop, users, appsHostnameSuffix, openshiftConsoleURL); util.IsRequeued(result, err) {
+	if result, err := r.reconcileGitOps(workshop, users, appsHostnameSuffix, openshiftConsoleURL); util.IsRequeued(result, err) {
 		return result, err
 	}
 

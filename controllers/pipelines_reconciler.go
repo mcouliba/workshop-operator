@@ -13,11 +13,11 @@ import (
 )
 
 // Reconciling Pipeline
-func (r *WorkshopReconciler) reconcilePipeline(workshop *workshopv1.Workshop) (reconcile.Result, error) {
+func (r *WorkshopReconciler) reconcilePipelines(workshop *workshopv1.Workshop) (reconcile.Result, error) {
 	enabledPipeline := workshop.Spec.Infrastructure.Pipeline.Enabled
 
 	if enabledPipeline {
-		if result, err := r.addPipeline(workshop); util.IsRequeued(result, err) {
+		if result, err := r.addPipelines(workshop); util.IsRequeued(result, err) {
 			return result, err
 		}
 	}
@@ -26,7 +26,7 @@ func (r *WorkshopReconciler) reconcilePipeline(workshop *workshopv1.Workshop) (r
 	return reconcile.Result{}, nil
 }
 
-func (r *WorkshopReconciler) addPipeline(workshop *workshopv1.Workshop) (reconcile.Result, error) {
+func (r *WorkshopReconciler) addPipelines(workshop *workshopv1.Workshop) (reconcile.Result, error) {
 
 	name := "openshift-pipelines-operator-rh"
 	channel := workshop.Spec.Infrastructure.Pipeline.OperatorHub.Channel
