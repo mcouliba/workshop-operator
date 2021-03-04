@@ -23,9 +23,9 @@ func NewCustomResource(workshop *workshopv1.Workshop, scheme *runtime.Scheme,
 		},
 		Spec: argocd.ArgoCDSpec{
 			ApplicationInstanceLabelKey: "argocd.argoproj.io/instance",
-			Dex: argocd.ArgoCDDexSpec{
-				OpenShiftOAuth: true,
-			},
+			// Dex: argocd.ArgoCDDexSpec{
+			// 	OpenShiftOAuth: true,
+			// },
 			Server: argocd.ArgoCDServerSpec{
 				Insecure: true,
 				Route: argocd.ArgoCDRouteSpec{

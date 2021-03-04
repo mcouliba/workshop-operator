@@ -37,7 +37,7 @@ spec:
       enabled: true
       operatorHub:
         channel: preview
-        clusterServiceVersion: redhat-openshift-pipelines-operator.v1.3.0
+        clusterServiceVersion: redhat-openshift-pipelines.v1.3.0
     project:
       enabled: true
       stagingName: cn-project
