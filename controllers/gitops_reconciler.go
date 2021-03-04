@@ -168,9 +168,9 @@ g, ` + username + `, ` + userRole + `
 	}
 
 	// Wait for ArgoCD Dex Server to be running
-	if !kubernetes.GetK8Client().GetDeploymentStatus("argocd-dex-server", namespace.Name) {
-		return reconcile.Result{Requeue: true}, nil
-	}
+	// if !kubernetes.GetK8Client().GetDeploymentStatus("argocd-dex-server", namespace.Name) {
+	// 	return reconcile.Result{Requeue: true}, nil
+	// }
 
 	// Wait for ArgoCD Server to be running
 	if !kubernetes.GetK8Client().GetDeploymentStatus("argocd-server", namespace.Name) {
