@@ -19,15 +19,23 @@ func NewDeployment(workshop *workshopv1.Workshop, scheme *runtime.Scheme,
 	appsHostnameSuffix string, openshiftConsoleURL string) *appsv1.Deployment {
 
 	image := "quay.io/mcouliba/username-distribution:latest"
-	guideURL := fmt.Sprintf("http://%%USERNAME%%-bookbag-workshop-guides.%s/workshop", appsHostnameSuffix)
+	labModuleURLs := "https://docs.openshift.com/container-platform/latest/welcome/index.html;openshift_docs"
+	guideURLParameters := "APPS_HOSTNAME_SUFFIX=" + appsHostnameSuffix +
+		"&USER_ID=%USER_ID%" +
+		"&OPENSHIFT_PASSWORD=" + workshop.Spec.User.Password +
+		"&WORKSHOP_GIT_REPO=" + url.QueryEscape(workshop.Spec.Source.GitURL) +
+		"&WORKSHOP_GIT_REF=" + workshop.Spec.Source.GitBranch
 
 	if workshop.Spec.Infrastructure.Guide.Scholars.Enabled {
-		guideURL = workshop.Spec.Infrastructure.Guide.Scholars.GuideURL + "?" +
-			"APPS_HOSTNAME_SUFFIX=" + appsHostnameSuffix +
-			"&USER_ID=%USER_ID%" +
-			"&OPENSHIFT_PASSWORD=" + workshop.Spec.User.Password +
-			"&WORKSHOP_GIT_REPO=" + url.QueryEscape(workshop.Spec.Source.GitURL) +
-			"&WORKSHOP_GIT_REF=" + workshop.Spec.Source.GitBranch
+		isFirst := true
+		for guideName, guideURL := range workshop.Spec.Infrastructure.Guide.Scholars.GuideURL {
+			if isFirst {
+				labModuleURLs = fmt.Sprintf("%s?%s;%s", guideURL, guideURLParameters, guideName)
+				isFirst = false
+			} else {
+				labModuleURLs = fmt.Sprintf("%s,%s?%s;%s", labModuleURLs, guideURL, guideURLParameters, guideName)
+			}
+		}
 	}
 
 	dep := &appsv1.Deployment{
@@ -92,7 +100,7 @@ func NewDeployment(workshop *workshopv1.Workshop, scheme *runtime.Scheme,
 								},
 								{
 									Name:  "LAB_MODULE_URLS",
-									Value: guideURL + ";" + workshop.Name,
+									Value: labModuleURLs,
 								},
 							},
 							Image:           image,

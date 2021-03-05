@@ -110,8 +110,8 @@ type ProjectSpec struct {
 
 // ScholarsSpec ...
 type ScholarsSpec struct {
-	Enabled  bool   `json:"enabled"`
-	GuideURL string `json:"guideURL"`
+	Enabled  bool              `json:"enabled"`
+	GuideURL map[string]string `json:"guideURL"`
 }
 
 // ServiceMeshSpec ...

@@ -159,7 +159,9 @@ spec:
                         enabled:
                           type: boolean
                         guideURL:
-                          type: string
+                          additionalProperties:
+                            type: string
+                          type: object
                       required:
                       - enabled
                       - guideURL
