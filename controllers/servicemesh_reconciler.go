@@ -86,7 +86,7 @@ func (r *WorkshopReconciler) addServiceMesh(workshop *workshopv1.Workshop, users
 	if workshop.Spec.Infrastructure.GitOps.Enabled {
 		argocdSubject := rbac.Subject{
 			Kind:     rbac.UserKind,
-			Name:     "system:serviceaccount:argocd:argocd-application-controller",
+			Name:     "system:serviceaccount:argocd:argocd-argocd-application-controller",
 			APIGroup: "rbac.authorization.k8s.io",
 		}
 		istioUsers = append(istioUsers, argocdSubject)

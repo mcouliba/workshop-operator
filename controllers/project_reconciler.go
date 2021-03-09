@@ -119,7 +119,7 @@ func (r *WorkshopReconciler) manageRoles(workshop *workshopv1.Workshop, projectN
 	argocdUsers := []rbac.Subject{}
 	userSubject = rbac.Subject{
 		Kind: rbac.UserKind,
-		Name: "system:serviceaccount:argocd:argocd-application-controller",
+		Name: "system:serviceaccount:argocd:argocd-argocd-application-controller",
 	}
 	argocdUsers = append(argocdUsers, userSubject)
 
