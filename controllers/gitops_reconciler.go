@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"reflect"
 
-	argocdv1 "github.com/argoproj-labs/argocd-operator/pkg/apis/argoproj/v1alpha1"
+	argocdoperatorv1 "github.com/argoproj-labs/argocd-operator/pkg/apis/argoproj/v1alpha1"
+	argocdv1 "github.com/argoproj/argo-cd/pkg/apis/application/v1alpha1"
 	workshopv1 "github.com/mcouliba/workshop-operator/api/v1"
 	"github.com/mcouliba/workshop-operator/common/argocd"
 	"github.com/mcouliba/workshop-operator/common/kubernetes"
@@ -41,6 +42,10 @@ func (r *WorkshopReconciler) addGitOps(workshop *workshopv1.Workshop, users int,
 	operatorNamespace := "openshift-operators"
 	channel := workshop.Spec.Infrastructure.GitOps.OperatorHub.Channel
 	clusterServiceVersion := workshop.Spec.Infrastructure.GitOps.OperatorHub.ClusterServiceVersion
+
+	labels := map[string]string{
+		"app.kubernetes.io/part-of": "argocd",
+	}
 
 	subscription := kubernetes.NewRedHatSubscription(workshop, r.Scheme, name, operatorNamespace,
 		name, channel, clusterServiceVersion)
@@ -84,13 +89,10 @@ func (r *WorkshopReconciler) addGitOps(workshop *workshopv1.Workshop, users int,
 		userRole := fmt.Sprintf("role:%s", username)
 		projectName := fmt.Sprintf("%s%d", workshop.Spec.Infrastructure.Project.StagingName, id)
 
-		userPolicy := `p, ` + userRole + `, applications, *, default/` + projectName + `, allow
+		userPolicy := `p, ` + userRole + `, applications, *, ` + projectName + `/*, allow
 p, ` + userRole + `, clusters, get, https://kubernetes.default.svc, allow
-p, ` + userRole + `, projects, get, default, allow
-p, ` + userRole + `, repositories, get, ` + workshop.Spec.Source.GitURL + `, allow
-p, ` + userRole + `, repositories, get, http://gitea-server.gitea.svc:3000/` + username + `/gitops-cn-project.git, allow
-p, ` + userRole + `, repositories, create, http://gitea-server.gitea.svc:3000/` + username + `/gitops-cn-project.git, allow
-p, ` + userRole + `, repositories, delete, http://gitea-server.gitea.svc:3000/` + username + `/gitops-cn-project.git, allow
+p, ` + userRole + `, projects, *,` + projectName + `, allow
+p, ` + userRole + `, repositories, *, http://gitea-server.gitea.svc:3000/` + username + `/*, allow
 g, ` + username + `, ` + userRole + `
 `
 		argocdPolicy = fmt.Sprintf("%s%s", argocdPolicy, userPolicy)
@@ -98,13 +100,30 @@ g, ` + username + `, ` + userRole + `
 		secretData[fmt.Sprintf("accounts.%s.password", username)] = bcryptPassword
 
 		configMapData[fmt.Sprintf("accounts.%s", username)] = "login"
+
+		labels["app.kubernetes.io/name"] = "appproject-cr"
+		appProjectCustomResource := argocd.NewAppProjectCustomResource(workshop, r.Scheme, projectName, namespace.Name, labels, argocdPolicy)
+		if err := r.Create(context.TODO(), appProjectCustomResource); err != nil && !errors.IsAlreadyExists(err) {
+			return reconcile.Result{}, err
+		} else if err == nil {
+			log.Infof("Created %s Custom Resource", appProjectCustomResource.Name)
+		} else if errors.IsAlreadyExists(err) {
+			customResourceFound := &argocdv1.AppProject{}
+			if err := r.Get(context.TODO(), types.NamespacedName{Name: appProjectCustomResource.Name, Namespace: namespace.Name}, customResourceFound); err != nil {
+				return reconcile.Result{}, err
+			} else if err == nil {
+				if !reflect.DeepEqual(appProjectCustomResource.Spec, customResourceFound.Spec) {
+					customResourceFound.Spec = appProjectCustomResource.Spec
+					if err := r.Update(context.TODO(), customResourceFound); err != nil {
+						return reconcile.Result{}, err
+					}
+					log.Infof("Updated %s Custom Resource", customResourceFound.Name)
+				}
+			}
+		}
 	}
 
-	labels := map[string]string{
-		"app.kubernetes.io/name":    "argocd-secret",
-		"app.kubernetes.io/part-of": "argocd",
-	}
-
+	labels["app.kubernetes.io/name"] = "argocd-secret"
 	secret := kubernetes.NewStringDataSecret(workshop, r.Scheme, "argocd-secret", namespace.Name, labels, secretData)
 	if err := r.Create(context.TODO(), secret); err != nil && !errors.IsAlreadyExists(err) {
 		return reconcile.Result{}, err
@@ -147,14 +166,14 @@ g, ` + username + `, ` + userRole + `
 	}
 
 	labels["app.kubernetes.io/name"] = "argocd-cr"
-	customResource := argocd.NewCustomResource(workshop, r.Scheme, "argocd", namespace.Name, labels, argocdPolicy)
-	if err := r.Create(context.TODO(), customResource); err != nil && !errors.IsAlreadyExists(err) {
+	argoCDCustomResource := argocd.NewArgoCDCustomResource(workshop, r.Scheme, "argocd", namespace.Name, labels, argocdPolicy)
+	if err := r.Create(context.TODO(), argoCDCustomResource); err != nil && !errors.IsAlreadyExists(err) {
 		return reconcile.Result{}, err
 	} else if err == nil {
-		log.Infof("Created %s Custom Resource", customResource.Name)
+		log.Infof("Created %s Custom Resource", argoCDCustomResource.Name)
 	} else if errors.IsAlreadyExists(err) {
-		customResourceFound := &argocdv1.ArgoCD{}
-		if err := r.Get(context.TODO(), types.NamespacedName{Name: customResource.Name, Namespace: namespace.Name}, customResourceFound); err != nil {
+		customResourceFound := &argocdoperatorv1.ArgoCD{}
+		if err := r.Get(context.TODO(), types.NamespacedName{Name: argoCDCustomResource.Name, Namespace: namespace.Name}, customResourceFound); err != nil {
 			return reconcile.Result{}, err
 		} else if err == nil {
 			if !reflect.DeepEqual(&argocdPolicy, customResourceFound.Spec.RBAC.Policy) {

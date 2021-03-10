@@ -508,6 +508,7 @@ rules:
 - apiGroups:
   - argoproj.io
   resources:
+  - appprojects
   - argocds
   verbs:
   - create
