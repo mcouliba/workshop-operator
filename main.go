@@ -20,7 +20,8 @@ import (
 	"flag"
 	"os"
 
-	argocd "github.com/argoproj-labs/argocd-operator/pkg/apis/argoproj/v1alpha1"
+	argocdoperatorv1 "github.com/argoproj-labs/argocd-operator/pkg/apis/argoproj/v1alpha1"
+	argocdv1 "github.com/argoproj/argo-cd/pkg/apis/application/v1alpha1"
 	che "github.com/eclipse/che-operator/pkg/apis/org/v1"
 	maistrav1 "github.com/maistra/istio-operator/pkg/apis/maistra/v1"
 	maistrav2 "github.com/maistra/istio-operator/pkg/apis/maistra/v2"
@@ -61,7 +62,8 @@ func init() {
 	utilruntime.Must(nexus.AddToScheme(scheme))
 	utilruntime.Must(maistrav1.SchemeBuilder.AddToScheme(scheme))
 	utilruntime.Must(maistrav2.SchemeBuilder.AddToScheme(scheme))
-	utilruntime.Must(argocd.SchemeBuilder.AddToScheme(scheme))
+	utilruntime.Must(argocdv1.SchemeBuilder.AddToScheme(scheme))
+	utilruntime.Must(argocdoperatorv1.SchemeBuilder.AddToScheme(scheme))
 	utilruntime.Must(che.SchemeBuilder.AddToScheme(scheme))
 
 	// +kubebuilder:scaffold:scheme
