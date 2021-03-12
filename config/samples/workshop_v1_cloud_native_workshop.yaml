@@ -15,8 +15,8 @@ spec:
       scholars:
         enabled: true
         guideURL: 
-          "inner-loop" : "https://redhat-scholars.github.io/inner-loop-guide/inner-loop/index.html"
-          "outer-loop" : "https://redhat-scholars.github.io/outer-loop-guide/outer-loop/index.html" 
+          "inner-loop" : "https://redhat-scholars.github.io/inner-loop-guide/inner-loop/5.0/index.html"
+          "outer-loop" : "https://redhat-scholars.github.io/outer-loop-guide/outer-loop/5.0/index.html" 
     codeReadyWorkspace:
       enabled: true
       operatorHub:
