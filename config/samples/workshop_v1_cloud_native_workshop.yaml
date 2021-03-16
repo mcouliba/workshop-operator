@@ -21,7 +21,7 @@ spec:
       enabled: true
       operatorHub:
         channel: latest
-        clusterServiceVersion: crwoperator.v2.6.0
+        clusterServiceVersion: crwoperator.v2.7.0
       openshiftOAuth: false
     gitea:
       enabled: true
