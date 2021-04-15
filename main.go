@@ -30,8 +30,8 @@ import (
 	"github.com/mcouliba/workshop-operator/common/nexus"
 	"github.com/mcouliba/workshop-operator/controllers"
 
-	securityv1 "github.com/openshift/api/security/v1"
 	routev1 "github.com/openshift/api/route/v1"
+	securityv1 "github.com/openshift/api/security/v1"
 	olmv1 "github.com/operator-framework/api/pkg/operators/v1"
 	olmv1alpha1 "github.com/operator-framework/api/pkg/operators/v1alpha1"
 	apiextensionsv1beta1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
@@ -66,8 +66,8 @@ func init() {
 	utilruntime.Must(argocdv1.SchemeBuilder.AddToScheme(scheme))
 	utilruntime.Must(argocdoperatorv1.SchemeBuilder.AddToScheme(scheme))
 	utilruntime.Must(che.SchemeBuilder.AddToScheme(scheme))
-	utilruntime.Must(securityv1.SchemeBuilder.AddToScheme(scheme))
-	
+	utilruntime.Must(securityv1.AddToScheme(scheme))
+
 	// +kubebuilder:scaffold:scheme
 }
 
