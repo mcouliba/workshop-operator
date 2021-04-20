@@ -172,20 +172,19 @@ spec:
                   properties:
                     enabled:
                       type: boolean
-                    image:
-                      description: ImageSpec ...
+                    operatorHub:
+                      description: OperatorHubSpec ...
                       properties:
-                        name:
+                        channel:
                           type: string
-                        tag:
+                        clusterServiceVersion:
                           type: string
                       required:
-                      - name
-                      - tag
+                      - channel
                       type: object
                   required:
                   - enabled
-                  - image
+                  - operatorHub
                   type: object
                 nexus:
                   description: NexusSpec ...

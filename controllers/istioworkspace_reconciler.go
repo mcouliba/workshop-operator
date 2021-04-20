@@ -32,47 +32,21 @@ func (r *WorkshopReconciler) reconcileIstioWorkspace(workshop *workshopv1.Worksh
 }
 
 func (r *WorkshopReconciler) addIstioWorkspace(workshop *workshopv1.Workshop, users int) (reconcile.Result, error) {
+	
+	channel := workshop.Spec.Infrastructure.IstioWorkspace.OperatorHub.Channel
+	clusterserviceversion := workshop.Spec.Infrastructure.IstioWorkspace.OperatorHub.ClusterServiceVersion
 
-	imageName := workshop.Spec.Infrastructure.IstioWorkspace.Image.Name
-	imageTag := workshop.Spec.Infrastructure.IstioWorkspace.Image.Tag
-
-	labels := map[string]string{
-		"app.kubernetes.io/part-of": "istio-workspace",
-	}
-
-	customResourceDefinition := kubernetes.NewCustomResourceDefinition(workshop, r.Scheme, "sessions.maistra.io", "maistra.io", "Session", "SessionList", "sessions", "session", "v1alpha1", nil, nil)
-	if err := r.Create(context.TODO(), customResourceDefinition); err != nil && !errors.IsAlreadyExists(err) {
+	subscription := kubernetes.NewCommunitySubscription(workshop, r.Scheme, "istio-workspace-operator", "openshift-operators",
+		"istio-workspace-operator", channel, clusterserviceversion)
+	if err := r.Create(context.TODO(), subscription); err != nil && !errors.IsAlreadyExists(err) {
 		return reconcile.Result{}, err
 	} else if err == nil {
-		log.Infof("Created %s Custom Resource Definition", customResourceDefinition.Name)
+		log.Infof("Created %s Subscription", subscription.Name)
 	}
 
-	serviceAccount := kubernetes.NewServiceAccount(workshop, r.Scheme, "istio-workspace", workshop.Namespace, labels)
-	if err := r.Create(context.TODO(), serviceAccount); err != nil && !errors.IsAlreadyExists(err) {
-		return reconcile.Result{}, err
-	} else if err == nil {
-		log.Infof("Created %s Service Account", serviceAccount.Name)
-	}
-
-	clusterRole := kubernetes.NewClusterRole(workshop, r.Scheme, "istio-workspace", workshop.Namespace, labels, kubernetes.IstioWorkspaceRules())
-	if err := r.Create(context.TODO(), clusterRole); err != nil && !errors.IsAlreadyExists(err) {
-		return reconcile.Result{}, err
-	} else if err == nil {
-		log.Infof("Created %s Cluster Role", clusterRole.Name)
-	}
-
-	clusterRoleBinding := kubernetes.NewClusterRoleBindingSA(workshop, r.Scheme, "istio-workspace", workshop.Namespace, labels, "istio-workspace", "istio-workspace", "ClusterRole")
-	if err := r.Create(context.TODO(), clusterRoleBinding); err != nil && !errors.IsAlreadyExists(err) {
-		return reconcile.Result{}, err
-	} else if err == nil {
-		log.Infof("Created %s Cluster Role Binding", clusterRoleBinding.Name)
-	}
-
-	operator := kubernetes.NewOperatorDeployment(workshop, r.Scheme, "istio-workspace", workshop.Namespace, labels, imageName+":"+imageTag, "istio-workspace", 8383, []string{"ike"}, []string{"serve"}, nil, nil)
-	if err := r.Create(context.TODO(), operator); err != nil && !errors.IsAlreadyExists(err) {
-		return reconcile.Result{}, err
-	} else if err == nil {
-		log.Infof("Created %s Operator", operator.Name)
+	if err := r.ApproveInstallPlan(clusterserviceversion, "istio-workspace-operator", "openshift-operators"); err != nil {
+		log.Infof("Waiting for Subscription to create InstallPlan for %s", subscription.Name)
+		return reconcile.Result{Requeue: true}, nil
 	}
 
 	for id := 1; id <= users; id++ {
@@ -101,38 +75,6 @@ func (r *WorkshopReconciler) addIstioWorkspace(workshop *workshopv1.Workshop, us
 		} else if err == nil {
 			log.Infof("Created %s Role Binding", roleBinding.Name)
 		}
-
-		// Create SCC
-		serviceAccountUser := "system:serviceaccount:" + stagingProjectName + ":default"
-
-		privilegedSCCFound := &securityv1.SecurityContextConstraints{}
-		if err := r.Get(context.TODO(), types.NamespacedName{Name: "privileged"}, privilegedSCCFound); err != nil {
-			return reconcile.Result{}, err
-		}
-
-		if !util.StringInSlice(serviceAccountUser, privilegedSCCFound.Users) {
-			privilegedSCCFound.Users = append(privilegedSCCFound.Users, serviceAccountUser)
-			if err := r.Update(context.TODO(), privilegedSCCFound); err != nil {
-				return reconcile.Result{}, err
-			} else if err == nil {
-				log.Infof("Updated %s SCC", privilegedSCCFound.Name)
-			}
-		}
-
-		anyuidSCCFound := &securityv1.SecurityContextConstraints{}
-		if err := r.Get(context.TODO(), types.NamespacedName{Name: "anyuid"}, anyuidSCCFound); err != nil {
-			return reconcile.Result{}, err
-		}
-
-		if !util.StringInSlice(serviceAccountUser, anyuidSCCFound.Users) {
-			anyuidSCCFound.Users = append(anyuidSCCFound.Users, serviceAccountUser)
-			if err := r.Update(context.TODO(), anyuidSCCFound); err != nil {
-				return reconcile.Result{}, err
-			} else if err == nil {
-				log.Infof("Updated %s SCC", anyuidSCCFound.Name)
-			}
-		}
-
 	}
 
 	//Success

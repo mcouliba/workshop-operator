@@ -139,8 +139,8 @@ type CodeReadyWorkspaceSpec struct {
 
 // IstioWorkspaceSpec ...
 type IstioWorkspaceSpec struct {
-	Enabled bool      `json:"enabled"`
-	Image   ImageSpec `json:"image"`
+	Enabled     bool            `json:"enabled"`
+	OperatorHub OperatorHubSpec `json:"operatorHub"`
 }
 
 // OperatorHubSpec ...
