@@ -48,6 +48,10 @@ func (r *WorkshopReconciler) addIstioWorkspace(workshop *workshopv1.Workshop, us
 		return reconcile.Result{Requeue: true}, nil
 	}
 
+	labels := map[string]string{
+		"app.kubernetes.io/part-of": "istio-workspace",
+	}
+	
 	for id := 1; id <= users; id++ {
 		username := fmt.Sprintf("user%d", id)
 		stagingProjectName := fmt.Sprintf("%s%d", workshop.Spec.Infrastructure.Project.StagingName, id)
