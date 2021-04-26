@@ -11,7 +11,6 @@ import (
 
 	rbac "k8s.io/api/rbac/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
 
@@ -51,7 +50,7 @@ func (r *WorkshopReconciler) addIstioWorkspace(workshop *workshopv1.Workshop, us
 	labels := map[string]string{
 		"app.kubernetes.io/part-of": "istio-workspace",
 	}
-	
+
 	for id := 1; id <= users; id++ {
 		username := fmt.Sprintf("user%d", id)
 		stagingProjectName := fmt.Sprintf("%s%d", workshop.Spec.Infrastructure.Project.StagingName, id)
