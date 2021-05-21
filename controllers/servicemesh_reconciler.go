@@ -109,34 +109,34 @@ func (r *WorkshopReconciler) addServiceMesh(workshop *workshopv1.Workshop, users
 		"app.kubernetes.io/part-of": "istio",
 	}
 
-	// jaegerRole := kubernetes.NewRole(workshop, r.Scheme,
-	// 	"workshop-jaeger", "istio-system", labels, kubernetes.JaegerUserRules())
-	// if err := r.Create(context.TODO(), jaegerRole); err != nil && !errors.IsAlreadyExists(err) {
-	// 	return reconcile.Result{}, err
-	// } else if err == nil {
-	// 	log.Infof("Created %s Role", jaegerRole.Name)
-	// }
+	jaegerRole := kubernetes.NewRole(workshop, r.Scheme,
+		"jaeger-user", "istio-system", labels, kubernetes.JaegerUserRules())
+	if err := r.Create(context.TODO(), jaegerRole); err != nil && !errors.IsAlreadyExists(err) {
+		return reconcile.Result{}, err
+	} else if err == nil {
+		log.Infof("Created %s Role", jaegerRole.Name)
+	}
 
-	// jaegerRoleBinding := kubernetes.NewRoleBindingUsers(workshop, r.Scheme,
-	// 	"workshop-jaeger", "istio-system", labels, istioUsers, jaegerRole.Name, "Role")
-	// if err := r.Create(context.TODO(), jaegerRoleBinding); err != nil && !errors.IsAlreadyExists(err) {
-	// 	return reconcile.Result{}, err
-	// } else if err == nil {
-	// 	log.Infof("Created %s Role Binding", jaegerRoleBinding.Name)
-	// } else if errors.IsAlreadyExists(err) {
-	// 	found := &rbac.RoleBinding{}
-	// 	if err := r.Get(context.TODO(), types.NamespacedName{Name: jaegerRoleBinding.Name, Namespace: istioSystemNamespace.Name}, found); err != nil {
-	// 		return reconcile.Result{}, err
-	// 	} else if err == nil {
-	// 		if !reflect.DeepEqual(istioUsers, found.Subjects) {
-	// 			found.Subjects = istioUsers
-	// 			if err := r.Update(context.TODO(), found); err != nil {
-	// 				return reconcile.Result{}, err
-	// 			}
-	// 			log.Infof("Updated %s Role Binding", found.Name)
-	// 		}
-	// 	}
-	// }
+	jaegerRoleBinding := kubernetes.NewRoleBindingUsers(workshop, r.Scheme,
+		"jaeger-users", "istio-system", labels, istioUsers, jaegerRole.Name, "Role")
+	if err := r.Create(context.TODO(), jaegerRoleBinding); err != nil && !errors.IsAlreadyExists(err) {
+		return reconcile.Result{}, err
+	} else if err == nil {
+		log.Infof("Created %s Role Binding", jaegerRoleBinding.Name)
+	} else if errors.IsAlreadyExists(err) {
+		found := &rbac.RoleBinding{}
+		if err := r.Get(context.TODO(), types.NamespacedName{Name: jaegerRoleBinding.Name, Namespace: istioSystemNamespace.Name}, found); err != nil {
+			return reconcile.Result{}, err
+		} else if err == nil {
+			if !reflect.DeepEqual(istioUsers, found.Subjects) {
+				found.Subjects = istioUsers
+				if err := r.Update(context.TODO(), found); err != nil {
+					return reconcile.Result{}, err
+				}
+				log.Infof("Updated %s Role Binding", found.Name)
+			}
+		}
+	}
 
 	meshUserRoleBinding := kubernetes.NewRoleBindingUsers(workshop, r.Scheme,
 		"mesh-users", "istio-system", labels, istioUsers, "mesh-user", "Role")
