@@ -7,10 +7,12 @@ import (
 	workshopv1 "github.com/mcouliba/workshop-operator/api/v1"
 	"github.com/mcouliba/workshop-operator/common/kubernetes"
 	"github.com/mcouliba/workshop-operator/common/util"
+	securityv1 "github.com/openshift/api/security/v1"
 	"github.com/prometheus/common/log"
 
 	rbac "k8s.io/api/rbac/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
 
@@ -30,7 +32,7 @@ func (r *WorkshopReconciler) reconcileIstioWorkspace(workshop *workshopv1.Worksh
 }
 
 func (r *WorkshopReconciler) addIstioWorkspace(workshop *workshopv1.Workshop, users int) (reconcile.Result, error) {
-	
+
 	channel := workshop.Spec.Infrastructure.IstioWorkspace.OperatorHub.Channel
 	clusterserviceversion := workshop.Spec.Infrastructure.IstioWorkspace.OperatorHub.ClusterServiceVersion
 
@@ -76,6 +78,37 @@ func (r *WorkshopReconciler) addIstioWorkspace(workshop *workshopv1.Workshop, us
 			return reconcile.Result{}, err
 		} else if err == nil {
 			log.Infof("Created %s Role Binding", roleBinding.Name)
+		}
+
+		// Create SCC
+		serviceAccountUser := "system:serviceaccount:" + stagingProjectName + ":default"
+
+		privilegedSCCFound := &securityv1.SecurityContextConstraints{}
+		if err := r.Get(context.TODO(), types.NamespacedName{Name: "privileged"}, privilegedSCCFound); err != nil {
+			return reconcile.Result{}, err
+		}
+
+		if !util.StringInSlice(serviceAccountUser, privilegedSCCFound.Users) {
+			privilegedSCCFound.Users = append(privilegedSCCFound.Users, serviceAccountUser)
+			if err := r.Update(context.TODO(), privilegedSCCFound); err != nil {
+				return reconcile.Result{}, err
+			} else if err == nil {
+				log.Infof("Updated %s SCC", privilegedSCCFound.Name)
+			}
+		}
+
+		anyuidSCCFound := &securityv1.SecurityContextConstraints{}
+		if err := r.Get(context.TODO(), types.NamespacedName{Name: "anyuid"}, anyuidSCCFound); err != nil {
+			return reconcile.Result{}, err
+		}
+
+		if !util.StringInSlice(serviceAccountUser, anyuidSCCFound.Users) {
+			anyuidSCCFound.Users = append(anyuidSCCFound.Users, serviceAccountUser)
+			if err := r.Update(context.TODO(), anyuidSCCFound); err != nil {
+				return reconcile.Result{}, err
+			} else if err == nil {
+				log.Infof("Updated %s SCC", anyuidSCCFound.Name)
+			}
 		}
 	}
 
