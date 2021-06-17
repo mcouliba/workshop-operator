@@ -133,19 +133,19 @@ g, ` + username + `, ` + userRole + `
 		subjects = append(subjects, argocdSubject)
 
 		role := kubernetes.NewRole(workshop, r.Scheme,
-			"argocd-manager-role", projectName, labels, kubernetes.ArgoCDRules())
+			"argocd-manager", projectName, labels, kubernetes.ArgoCDRules())
 		if err := r.Create(context.TODO(), role); err != nil && !errors.IsAlreadyExists(err) {
 			return reconcile.Result{}, err
 		} else if err == nil {
-			log.Infof("Created %s Role", role.Name)
+			log.Infof("Created %s Role in % namespace", role.Name, projectName)
 		}
 
 		roleBinding := kubernetes.NewRoleBindingUsers(workshop, r.Scheme,
-			"argocd-manager-role-binding", projectName, labels, subjects, role.Name, "Role")
+			"argocd-manager", projectName, labels, subjects, role.Name, "Role")
 		if err := r.Create(context.TODO(), roleBinding); err != nil && !errors.IsAlreadyExists(err) {
 			return reconcile.Result{}, err
 		} else if err == nil {
-			log.Infof("Created %s Role Binding", roleBinding.Name)
+			log.Infof("Created %s Role Binding in % namespace", roleBinding.Name, projectName)
 		} else if errors.IsAlreadyExists(err) {
 			found := &rbac.RoleBinding{}
 			if err := r.Get(context.TODO(), types.NamespacedName{Name: roleBinding.Name, Namespace: projectName}, found); err != nil {
@@ -156,7 +156,7 @@ g, ` + username + `, ` + userRole + `
 					if err := r.Update(context.TODO(), found); err != nil {
 						return reconcile.Result{}, err
 					}
-					log.Infof("Updated %s Role Binding", found.Name)
+					log.Infof("Updated %s Role Binding in % namespace", found.Name, projectName)
 				}
 			}
 		}
