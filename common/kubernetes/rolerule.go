@@ -301,3 +301,20 @@ func CheRules() []rbac.PolicyRule {
 		},
 	}
 }
+
+//ArgoCDRules gets Rules
+func ArgoCDRules() []rbac.PolicyRule {
+	return []rbac.PolicyRule{
+		{
+			APIGroups: []string{
+				"*",
+			},
+			Resources: []string{
+				"*",
+			},
+			Verbs: []string{
+				"*",
+			},
+		},
+	}
+}
