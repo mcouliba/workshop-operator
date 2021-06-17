@@ -32,7 +32,7 @@ spec:
       enabled: true
       operatorHub:
         channel: stable
-        clusterServiceVersion: openshift-gitops-operator.v1.1.0
+        clusterServiceVersion: openshift-gitops-operator.v1.1.2
     nexus:
       enabled: true
     pipeline:
@@ -47,7 +47,7 @@ spec:
       enabled: true
       serviceMeshOperatorHub:
         channel: "stable"
-        clusterServiceVersion: servicemeshoperator.v2.0.4
+        clusterServiceVersion: servicemeshoperator.v2.0.5.2
       elasticSearchOperatorHub:
         channel: "stable"
       jaegerOperatorHub:
