@@ -17,8 +17,8 @@ func (r *WorkshopReconciler) ApproveInstallPlan(clusterServiceVersion string, su
 		return err
 	}
 
-	if (clusterServiceVersion == "" && subscription.Status.InstalledCSV == "") || 
-		(clusterServiceVersion != "" && (subscription.Status.InstalledCSV != clusterServiceVersion || subscription.Status.CurrentCSV != clusterServiceVersion)) {
+	if (clusterServiceVersion == "" && subscription.Status.InstalledCSV == "") ||
+		(clusterServiceVersion != "" && (subscription.Status.InstalledCSV != clusterServiceVersion)) {
 		if subscription.Status.InstallPlanRef == nil {
 			return errors.New("InstallPlan Approval: Subscription is not ready yet")
 		}
@@ -28,7 +28,7 @@ func (r *WorkshopReconciler) ApproveInstallPlan(clusterServiceVersion string, su
 			return err
 		}
 
-		if !installPlan.Spec.Approved {
+		if (installPlan.Spec.ClusterServiceVersionNames[0] == clusterServiceVersion) && !installPlan.Spec.Approved {
 			installPlan.Spec.Approved = true
 			if err := r.Update(context.TODO(), installPlan); err != nil {
 				return err
