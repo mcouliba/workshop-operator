@@ -32,7 +32,7 @@ spec:
       enabled: true
       operatorHub:
         channel: stable
-        clusterServiceVersion: openshift-gitops-operator.v1.1.0
+        clusterServiceVersion: openshift-gitops-operator.v1.1.2
     nexus:
       enabled: true
     pipeline:
