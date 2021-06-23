@@ -170,13 +170,6 @@ func (r *WorkshopReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	}
 
 	//////////////////////////
-	// Pipeline
-	//////////////////////////
-	if result, err := r.reconcilePipelines(workshop); util.IsRequeued(result, err) {
-		return result, err
-	}
-
-	//////////////////////////
 	// Gitea
 	//////////////////////////
 	if result, err := r.reconcileGitea(workshop, users); util.IsRequeued(result, err) {
@@ -187,6 +180,13 @@ func (r *WorkshopReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	// GitOps
 	//////////////////////////
 	if result, err := r.reconcileGitOps(workshop, users, appsHostnameSuffix, openshiftConsoleURL); util.IsRequeued(result, err) {
+		return result, err
+	}
+
+	//////////////////////////
+	// Pipeline
+	//////////////////////////
+	if result, err := r.reconcilePipelines(workshop); util.IsRequeued(result, err) {
 		return result, err
 	}
 

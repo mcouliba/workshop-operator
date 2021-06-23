@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/mcouliba/workshop-operator/common/kubernetes"
+	"github.com/mcouliba/workshop-operator/common/util"
 	olmv1alpha1 "github.com/operator-framework/api/pkg/operators/v1alpha1"
 	"github.com/prometheus/common/log"
 )
@@ -28,7 +29,7 @@ func (r *WorkshopReconciler) ApproveInstallPlan(clusterServiceVersion string, su
 			return err
 		}
 
-		if (installPlan.Spec.ClusterServiceVersionNames[0] == clusterServiceVersion) && !installPlan.Spec.Approved {
+		if util.StringInSlice(clusterServiceVersion, installPlan.Spec.ClusterServiceVersionNames) && !installPlan.Spec.Approved {
 			installPlan.Spec.Approved = true
 			if err := r.Update(context.TODO(), installPlan); err != nil {
 				return err
