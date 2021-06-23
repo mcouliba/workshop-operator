@@ -34,7 +34,7 @@ func (r *WorkshopReconciler) ApproveInstallPlan(clusterServiceVersion string, su
 			if err := r.Update(context.TODO(), installPlan); err != nil {
 				return err
 			}
-			log.Infof("%s Subscription in %s project Approved", subscriptionName, namespace)
+			log.Infof("%s InstallPlan in %s project Approved", installPlan.Name, namespace)
 		}
 	}
 	return nil

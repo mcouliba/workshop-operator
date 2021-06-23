@@ -177,16 +177,16 @@ func (r *WorkshopReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	}
 
 	//////////////////////////
-	// GitOps
+	// Pipeline
 	//////////////////////////
-	if result, err := r.reconcileGitOps(workshop, users, appsHostnameSuffix, openshiftConsoleURL); util.IsRequeued(result, err) {
+	if result, err := r.reconcilePipelines(workshop); util.IsRequeued(result, err) {
 		return result, err
 	}
 
 	//////////////////////////
-	// Pipeline
+	// GitOps
 	//////////////////////////
-	if result, err := r.reconcilePipelines(workshop); util.IsRequeued(result, err) {
+	if result, err := r.reconcileGitOps(workshop, users, appsHostnameSuffix, openshiftConsoleURL); util.IsRequeued(result, err) {
 		return result, err
 	}
 

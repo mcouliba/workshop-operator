@@ -82,6 +82,7 @@ func (r *WorkshopReconciler) addGitOps(workshop *workshopv1.Workshop, users int,
 	bcryptPassword := string(hashedPassword)
 
 	argocdPolicy := ""
+	namespaceList := ""
 	secretData := map[string]string{}
 	configMapData := map[string]string{}
 
@@ -89,6 +90,11 @@ func (r *WorkshopReconciler) addGitOps(workshop *workshopv1.Workshop, users int,
 		username := fmt.Sprintf("user%d", id)
 		userRole := fmt.Sprintf("role:%s", username)
 		projectName := fmt.Sprintf("%s%d", workshop.Spec.Infrastructure.Project.StagingName, id)
+		if id == 1 {
+			namespaceList = projectName
+		} else {
+			namespaceList = fmt.Sprintf("%s,%s", namespaceList, projectName)
+		}
 
 		userPolicy := `p, ` + userRole + `, applications, *, ` + projectName + `/*, allow
 p, ` + userRole + `, clusters, get, https://kubernetes.default.svc, allow
@@ -204,6 +210,13 @@ g, ` + username + `, ` + userRole + `
 		}
 	}
 
+	//HEREHERE
+	labels["app.kubernetes.io/name"] = "argocd-default-cluster-config"
+
+	if result, err := r.createArgocdDefaultClusterConfigSecret(workshop, namespace.Name, labels, namespaceList); util.IsRequeued(result, err) {
+		return result, err
+	}
+
 	labels["app.kubernetes.io/name"] = "argocd-cr"
 	argoCDCustomResource := argocd.NewArgoCDCustomResource(workshop, r.Scheme, "argocd", namespace.Name, labels, argocdPolicy)
 	if err := r.Create(context.TODO(), argoCDCustomResource); err != nil && !errors.IsAlreadyExists(err) {
@@ -233,6 +246,65 @@ g, ` + username + `, ` + userRole + `
 	// Wait for ArgoCD Server to be running
 	if !kubernetes.GetK8Client().GetDeploymentStatus("argocd-server", namespace.Name) {
 		return reconcile.Result{Requeue: true}, nil
+	}
+
+	//Success
+	return reconcile.Result{}, nil
+}
+
+func (r *WorkshopReconciler) createArgocdDefaultClusterConfigSecret(workshop *workshopv1.Workshop, namespaceName string,
+	labels map[string]string, namespaceList string) (reconcile.Result, error) {
+
+	secretName := "argocd-default-cluster-config"
+	clusterConfigSecretData := map[string]string{}
+
+	configParam, err := bcrypt.GenerateFromPassword([]byte("{\"tlsClientConfig\":{\"insecure\":false}}"), bcrypt.DefaultCost)
+	if err != nil {
+		log.Errorf("Error when Bcrypt encrypt 'config' parameter for %s secret: %v", secretName, err)
+		return reconcile.Result{}, err
+	}
+
+	nameParam, err := bcrypt.GenerateFromPassword([]byte("in-cluster"), bcrypt.DefaultCost)
+	if err != nil {
+		log.Errorf("Error when Bcrypt encrypt 'name' parameter for %s secret: %v", secretName, err)
+		return reconcile.Result{}, err
+	}
+
+	namespacesParam, err := bcrypt.GenerateFromPassword([]byte(namespaceList), bcrypt.DefaultCost)
+	if err != nil {
+		log.Errorf("Error when Bcrypt encrypt 'namespaces' parameter for %s secret: %v", secretName, err)
+		return reconcile.Result{}, err
+	}
+
+	serverParam, err := bcrypt.GenerateFromPassword([]byte("https://kubernetes.default.svc"), bcrypt.DefaultCost)
+	if err != nil {
+		log.Errorf("Error when Bcrypt encrypt 'server' parameter for %s secret: %v", secretName, err)
+		return reconcile.Result{}, err
+	}
+
+	clusterConfigSecretData["config"] = string(configParam)
+	clusterConfigSecretData["name"] = string(nameParam)
+	clusterConfigSecretData["namespaces"] = string(namespacesParam)
+	clusterConfigSecretData["server"] = string(serverParam)
+
+	clusterConfigSecret := kubernetes.NewStringDataSecret(workshop, r.Scheme, "argocd-default-cluster-config", namespaceName, labels, clusterConfigSecretData)
+	if err := r.Create(context.TODO(), clusterConfigSecret); err != nil && !errors.IsAlreadyExists(err) {
+		return reconcile.Result{}, err
+	} else if err == nil {
+		log.Infof("Created %s Secret", clusterConfigSecret.Name)
+	} else if errors.IsAlreadyExists(err) {
+		clusterConfigSecretFound := &corev1.Secret{}
+		if err := r.Get(context.TODO(), types.NamespacedName{Name: clusterConfigSecret.Name, Namespace: namespaceName}, clusterConfigSecretFound); err != nil {
+			return reconcile.Result{}, err
+		} else if err == nil {
+			if !util.IsIntersectMap(clusterConfigSecretData, clusterConfigSecretFound.StringData) {
+				clusterConfigSecretFound.StringData = clusterConfigSecretData
+				if err := r.Update(context.TODO(), clusterConfigSecretFound); err != nil {
+					return reconcile.Result{}, err
+				}
+				log.Infof("Updated %s Secret", clusterConfigSecretFound.Name)
+			}
+		}
 	}
 
 	//Success
