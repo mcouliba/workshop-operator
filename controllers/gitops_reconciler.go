@@ -258,36 +258,12 @@ func (r *WorkshopReconciler) createArgocdDefaultClusterConfigSecret(workshop *wo
 	secretName := "argocd-default-cluster-config"
 	clusterConfigSecretData := map[string]string{}
 
-	configParam, err := bcrypt.GenerateFromPassword([]byte("{\"tlsClientConfig\":{\"insecure\":false}}"), bcrypt.DefaultCost)
-	if err != nil {
-		log.Errorf("Error when Bcrypt encrypt 'config' parameter for %s secret: %v", secretName, err)
-		return reconcile.Result{}, err
-	}
+	clusterConfigSecretData["config"] = "{\"tlsClientConfig\":{\"insecure\":false}}"
+	clusterConfigSecretData["name"] = "in-cluster"
+	clusterConfigSecretData["namespaces"] = namespaceList
+	clusterConfigSecretData["server"] = "https://kubernetes.default.svc"
 
-	nameParam, err := bcrypt.GenerateFromPassword([]byte("in-cluster"), bcrypt.DefaultCost)
-	if err != nil {
-		log.Errorf("Error when Bcrypt encrypt 'name' parameter for %s secret: %v", secretName, err)
-		return reconcile.Result{}, err
-	}
-
-	namespacesParam, err := bcrypt.GenerateFromPassword([]byte(namespaceList), bcrypt.DefaultCost)
-	if err != nil {
-		log.Errorf("Error when Bcrypt encrypt 'namespaces' parameter for %s secret: %v", secretName, err)
-		return reconcile.Result{}, err
-	}
-
-	serverParam, err := bcrypt.GenerateFromPassword([]byte("https://kubernetes.default.svc"), bcrypt.DefaultCost)
-	if err != nil {
-		log.Errorf("Error when Bcrypt encrypt 'server' parameter for %s secret: %v", secretName, err)
-		return reconcile.Result{}, err
-	}
-
-	clusterConfigSecretData["config"] = string(configParam)
-	clusterConfigSecretData["name"] = string(nameParam)
-	clusterConfigSecretData["namespaces"] = string(namespacesParam)
-	clusterConfigSecretData["server"] = string(serverParam)
-
-	clusterConfigSecret := kubernetes.NewStringDataSecret(workshop, r.Scheme, "argocd-default-cluster-config", namespaceName, labels, clusterConfigSecretData)
+	clusterConfigSecret := kubernetes.NewStringDataSecret(workshop, r.Scheme, secretName, namespaceName, labels, clusterConfigSecretData)
 	if err := r.Create(context.TODO(), clusterConfigSecret); err != nil && !errors.IsAlreadyExists(err) {
 		return reconcile.Result{}, err
 	} else if err == nil {
