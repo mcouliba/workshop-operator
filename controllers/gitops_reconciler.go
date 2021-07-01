@@ -210,13 +210,6 @@ g, ` + username + `, ` + userRole + `
 		}
 	}
 
-	//HEREHERE
-	labels["app.kubernetes.io/name"] = "argocd-default-cluster-config"
-
-	if result, err := r.createArgocdDefaultClusterConfigSecret(workshop, namespace.Name, labels, namespaceList); util.IsRequeued(result, err) {
-		return result, err
-	}
-
 	labels["app.kubernetes.io/name"] = "argocd-cr"
 	argoCDCustomResource := argocd.NewArgoCDCustomResource(workshop, r.Scheme, "argocd", namespace.Name, labels, argocdPolicy)
 	if err := r.Create(context.TODO(), argoCDCustomResource); err != nil && !errors.IsAlreadyExists(err) {
@@ -248,11 +241,17 @@ g, ` + username + `, ` + userRole + `
 		return reconcile.Result{Requeue: true}, nil
 	}
 
+	labels["app.kubernetes.io/name"] = "argocd-default-cluster-config"
+
+	if result, err := r.manageArgocdDefaultClusterConfigSecret(workshop, namespace.Name, labels, namespaceList); util.IsRequeued(result, err) {
+		return result, err
+	}
+
 	//Success
 	return reconcile.Result{}, nil
 }
 
-func (r *WorkshopReconciler) createArgocdDefaultClusterConfigSecret(workshop *workshopv1.Workshop, namespaceName string,
+func (r *WorkshopReconciler) manageArgocdDefaultClusterConfigSecret(workshop *workshopv1.Workshop, namespaceName string,
 	labels map[string]string, namespaceList string) (reconcile.Result, error) {
 
 	secretName := "argocd-default-cluster-config"
