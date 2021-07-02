@@ -143,7 +143,7 @@ g, ` + username + `, ` + userRole + `
 		if err := r.Create(context.TODO(), role); err != nil && !errors.IsAlreadyExists(err) {
 			return reconcile.Result{}, err
 		} else if err == nil {
-			log.Infof("Created %s Role in % namespace", role.Name, projectName)
+			log.Infof("Created %s Role in %s namespace", role.Name, projectName)
 		}
 
 		roleBinding := kubernetes.NewRoleBindingUsers(workshop, r.Scheme,
@@ -151,7 +151,7 @@ g, ` + username + `, ` + userRole + `
 		if err := r.Create(context.TODO(), roleBinding); err != nil && !errors.IsAlreadyExists(err) {
 			return reconcile.Result{}, err
 		} else if err == nil {
-			log.Infof("Created %s Role Binding in % namespace", roleBinding.Name, projectName)
+			log.Infof("Created %s Role Binding in %s namespace", roleBinding.Name, projectName)
 		} else if errors.IsAlreadyExists(err) {
 			found := &rbac.RoleBinding{}
 			if err := r.Get(context.TODO(), types.NamespacedName{Name: roleBinding.Name, Namespace: projectName}, found); err != nil {
@@ -162,7 +162,7 @@ g, ` + username + `, ` + userRole + `
 					if err := r.Update(context.TODO(), found); err != nil {
 						return reconcile.Result{}, err
 					}
-					log.Infof("Updated %s Role Binding in % namespace", found.Name, projectName)
+					log.Infof("Updated %s Role Binding in %s namespace", found.Name, projectName)
 				}
 			}
 		}
