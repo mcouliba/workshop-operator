@@ -183,6 +183,7 @@ func (r *WorkshopReconciler) addElasticSearchOperator(workshop *workshopv1.Works
 
 	channel := workshop.Spec.Infrastructure.ServiceMesh.ElasticSearchOperatorHub.Channel
 	clusterserviceversion := workshop.Spec.Infrastructure.ServiceMesh.ElasticSearchOperatorHub.ClusterServiceVersion
+	subcriptionName := fmt.Sprintf("elasticsearch-operator-%s", channel)
 
 	redhatOperatorsNamespace := kubernetes.NewNamespace(workshop, r.Scheme, "openshift-operators-redhat")
 	if err := r.Create(context.TODO(), redhatOperatorsNamespace); err != nil && !errors.IsAlreadyExists(err) {
@@ -191,7 +192,7 @@ func (r *WorkshopReconciler) addElasticSearchOperator(workshop *workshopv1.Works
 		log.Infof("Created %s Namespace", redhatOperatorsNamespace.Name)
 	}
 
-	subscription := kubernetes.NewRedHatSubscription(workshop, r.Scheme, "elasticsearch-operator", "openshift-operators-redhat",
+	subscription := kubernetes.NewRedHatSubscription(workshop, r.Scheme, subcriptionName, "openshift-operators-redhat",
 		"elasticsearch-operator", channel, clusterserviceversion)
 	if err := r.Create(context.TODO(), subscription); err != nil && !errors.IsAlreadyExists(err) {
 		return reconcile.Result{}, err
@@ -199,7 +200,7 @@ func (r *WorkshopReconciler) addElasticSearchOperator(workshop *workshopv1.Works
 		log.Infof("Created %s Subscription", subscription.Name)
 	}
 
-	if err := r.ApproveInstallPlan(clusterserviceversion, "elasticsearch-operator", "openshift-operators-redhat"); err != nil {
+	if err := r.ApproveInstallPlan(clusterserviceversion, subcriptionName, "openshift-operators-redhat"); err != nil {
 		log.Infof("Waiting for Subscription to create InstallPlan for %s", subscription.Name)
 		return reconcile.Result{Requeue: true}, nil
 	}
