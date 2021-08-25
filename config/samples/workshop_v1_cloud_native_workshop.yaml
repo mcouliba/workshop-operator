@@ -9,7 +9,7 @@ spec:
     password: openshift
   source:
     gitURL: https://github.com/mcouliba/cloud-native-workshop
-    gitBranch: "5.0"
+    gitBranch: "5.1"
   infrastructure:
     guide:
       scholars:
@@ -21,7 +21,7 @@ spec:
       enabled: true
       operatorHub:
         channel: latest
-        clusterServiceVersion: crwoperator.v2.9.0
+        clusterServiceVersion: crwoperator.v2.10.1
       openshiftOAuth: false
     gitea:
       enabled: true
@@ -32,14 +32,14 @@ spec:
       enabled: true
       operatorHub:
         channel: stable
-        clusterServiceVersion: openshift-gitops-operator.v1.1.2
+        clusterServiceVersion: openshift-gitops-operator.v1.2.0
     nexus:
       enabled: true
     pipeline:
       enabled: true
       operatorHub:
         channel: stable
-        clusterServiceVersion: redhat-openshift-pipelines.v1.4.1
+        clusterServiceVersion: redhat-openshift-pipelines.v1.5.0
     project:
       enabled: true
       stagingName: cn-project
@@ -47,11 +47,11 @@ spec:
       enabled: true
       serviceMeshOperatorHub:
         channel: "stable"
-        clusterServiceVersion: servicemeshoperator.v2.0.6
+        clusterServiceVersion: servicemeshoperator.v2.0.7
       elasticSearchOperatorHub:
         channel: "stable"
       jaegerOperatorHub:
         channel: "stable"
       kialiOperatorHub:
         channel: "stable"
-        clusterServiceVersion: kiali-operator.v1.24.7
+        clusterServiceVersion: kiali-operator.v1.24.9
