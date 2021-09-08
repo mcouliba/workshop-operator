@@ -14,9 +14,9 @@ spec:
     guide:
       scholars:
         enabled: true
-        guideURL: 
-          "inner-loop" : "https://redhat-scholars.github.io/inner-loop-guide/inner-loop/5.0/index.html"
-          "outer-loop" : "https://redhat-scholars.github.io/outer-loop-guide/outer-loop/5.0/index.html" 
+        guideURL:
+          "inner-loop" : "https://redhat-scholars.github.io/inner-loop-guide/inner-loop/5.1/index.html" 
+          "outer-loop" : "https://redhat-scholars.github.io/outer-loop-guide/outer-loop/5.1/index.html" 
     codeReadyWorkspace:
       enabled: true
       operatorHub:
@@ -39,7 +39,7 @@ spec:
       enabled: true
       operatorHub:
         channel: stable
-        clusterServiceVersion: redhat-openshift-pipelines.v1.5.0
+        clusterServiceVersion: redhat-openshift-pipelines.v1.5.1
     project:
       enabled: true
       stagingName: cn-project
@@ -47,7 +47,7 @@ spec:
       enabled: true
       serviceMeshOperatorHub:
         channel: "stable"
-        clusterServiceVersion: servicemeshoperator.v2.0.7
+        clusterServiceVersion: servicemeshoperator.v2.0.7.1
       elasticSearchOperatorHub:
         channel: "stable"
       jaegerOperatorHub:
