@@ -13,7 +13,6 @@ import (
 	"github.com/prometheus/common/log"
 	"golang.org/x/crypto/bcrypt"
 	corev1 "k8s.io/api/core/v1"
-	rbac "k8s.io/api/rbac/v1"
 
 	"github.com/mcouliba/workshop-operator/common/util"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -125,44 +124,6 @@ g, ` + username + `, ` + userRole + `
 						return reconcile.Result{}, err
 					}
 					log.Infof("Updated %s Custom Resource", customResourceFound.Name)
-				}
-			}
-		}
-
-		subjects := []rbac.Subject{}
-		argocdSubject := rbac.Subject{
-			Kind:     rbac.UserKind,
-			Name:     "system:serviceaccount:argocd:argocd-argocd-application-controller",
-			APIGroup: "rbac.authorization.k8s.io",
-		}
-
-		subjects = append(subjects, argocdSubject)
-
-		role := kubernetes.NewRole(workshop, r.Scheme,
-			"argocd-manager", projectName, labels, kubernetes.ArgoCDRules())
-		if err := r.Create(context.TODO(), role); err != nil && !errors.IsAlreadyExists(err) {
-			return reconcile.Result{}, err
-		} else if err == nil {
-			log.Infof("Created %s Role in %s namespace", role.Name, projectName)
-		}
-
-		roleBinding := kubernetes.NewRoleBindingUsers(workshop, r.Scheme,
-			"argocd-manager", projectName, labels, subjects, role.Name, "Role")
-		if err := r.Create(context.TODO(), roleBinding); err != nil && !errors.IsAlreadyExists(err) {
-			return reconcile.Result{}, err
-		} else if err == nil {
-			log.Infof("Created %s Role Binding in %s namespace", roleBinding.Name, projectName)
-		} else if errors.IsAlreadyExists(err) {
-			found := &rbac.RoleBinding{}
-			if err := r.Get(context.TODO(), types.NamespacedName{Name: roleBinding.Name, Namespace: projectName}, found); err != nil {
-				return reconcile.Result{}, err
-			} else if err == nil {
-				if !reflect.DeepEqual(subjects, found.Subjects) {
-					found.Subjects = subjects
-					if err := r.Update(context.TODO(), found); err != nil {
-						return reconcile.Result{}, err
-					}
-					log.Infof("Updated %s Role Binding in %s namespace", found.Name, projectName)
 				}
 			}
 		}

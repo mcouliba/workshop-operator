@@ -36,19 +36,6 @@ func (r *WorkshopReconciler) addIstioWorkspace(workshop *workshopv1.Workshop, us
 	channel := workshop.Spec.Infrastructure.IstioWorkspace.OperatorHub.Channel
 	clusterserviceversion := workshop.Spec.Infrastructure.IstioWorkspace.OperatorHub.ClusterServiceVersion
 
-	subscription := kubernetes.NewCommunitySubscription(workshop, r.Scheme, "istio-workspace-operator", "openshift-operators",
-		"istio-workspace-operator", channel, clusterserviceversion)
-	if err := r.Create(context.TODO(), subscription); err != nil && !errors.IsAlreadyExists(err) {
-		return reconcile.Result{}, err
-	} else if err == nil {
-		log.Infof("Created %s Subscription", subscription.Name)
-	}
-
-	if err := r.ApproveInstallPlan(clusterserviceversion, "istio-workspace-operator", "openshift-operators"); err != nil {
-		log.Infof("Waiting for Subscription to create InstallPlan for %s", subscription.Name)
-		return reconcile.Result{Requeue: true}, nil
-	}
-
 	labels := map[string]string{
 		"app.kubernetes.io/part-of": "istio-workspace",
 	}
@@ -110,6 +97,19 @@ func (r *WorkshopReconciler) addIstioWorkspace(workshop *workshopv1.Workshop, us
 				log.Infof("Updated %s SCC", anyuidSCCFound.Name)
 			}
 		}
+	}
+
+	subscription := kubernetes.NewCommunitySubscription(workshop, r.Scheme, "istio-workspace-operator", "openshift-operators",
+		"istio-workspace-operator", channel, clusterserviceversion)
+	if err := r.Create(context.TODO(), subscription); err != nil && !errors.IsAlreadyExists(err) {
+		return reconcile.Result{}, err
+	} else if err == nil {
+		log.Infof("Created %s Subscription", subscription.Name)
+	}
+
+	if err := r.ApproveInstallPlan(clusterserviceversion, "istio-workspace-operator", "openshift-operators"); err != nil {
+		log.Infof("Waiting for Subscription to create InstallPlan for %s", subscription.Name)
+		return reconcile.Result{Requeue: true}, nil
 	}
 
 	//Success

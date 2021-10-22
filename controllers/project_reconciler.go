@@ -116,21 +116,49 @@ func (r *WorkshopReconciler) manageRoles(workshop *workshopv1.Workshop, projectN
 		log.Infof("Created %s Role Binding", defaultRoleBinding.Name)
 	}
 
-	argocdUsers := []rbac.Subject{}
-	userSubject = rbac.Subject{
+	//Argo CD
+	argocdSAs := []rbac.Subject{}
+	argocdApplicationControllerSubject := rbac.Subject{
 		Kind: rbac.UserKind,
 		Name: "system:serviceaccount:argocd:argocd-argocd-application-controller",
 	}
-	argocdUsers = append(argocdUsers, userSubject)
+	argocdSAs = append(argocdSAs, argocdApplicationControllerSubject)
 
-	//Argo CD
-	argocdEditRoleBinding := kubernetes.NewRoleBindingUsers(workshop, r.Scheme,
-		username+"-argocd", projectName, labels, argocdUsers, "edit", "ClusterRole")
-	if err := r.Create(context.TODO(), argocdEditRoleBinding); err != nil && !errors.IsAlreadyExists(err) {
+	argocdServerSubject := rbac.Subject{
+		Kind: rbac.UserKind,
+		Name: "system:serviceaccount:argocd:argocd-argocd-server",
+	}
+	argocdSAs = append(argocdSAs, argocdServerSubject)
+
+	argocdManagerRole := kubernetes.NewRole(workshop, r.Scheme,
+		"argocd-manager", projectName, labels, kubernetes.ArgoCDRules())
+	if err := r.Create(context.TODO(), argocdManagerRole); err != nil && !errors.IsAlreadyExists(err) {
 		return reconcile.Result{}, err
 	} else if err == nil {
-		log.Infof("Created %s Role Binding", argocdEditRoleBinding.Name)
+		log.Infof("Created %s Role in %s namespace", argocdManagerRole.Name, projectName)
 	}
+
+	argocdManagerRoleBinding := kubernetes.NewRoleBindingUsers(workshop, r.Scheme,
+		"argocd-manager", projectName, labels, argocdSAs, argocdManagerRole.Name, "Role")
+	if err := r.Create(context.TODO(), argocdManagerRoleBinding); err != nil && !errors.IsAlreadyExists(err) {
+		return reconcile.Result{}, err
+	} else if err == nil {
+		log.Infof("Created %s Role Binding in %s namespace", argocdManagerRoleBinding.Name, projectName)
+	}
+	// } else if errors.IsAlreadyExists(err) {
+	// 	found := &rbac.RoleBinding{}
+	// 	if err := r.Get(context.TODO(), types.NamespacedName{Name: argocdManagerRoleBinding.Name, Namespace: projectName}, found); err != nil {
+	// 		return reconcile.Result{}, err
+	// 	} else if err == nil {
+	// 		if !reflect.DeepEqual(argocdSAs, found.Subjects) {
+	// 			found.Subjects = argocdSAs
+	// 			if err := r.Update(context.TODO(), found); err != nil {
+	// 				return reconcile.Result{}, err
+	// 			}
+	// 			log.Infof("Updated %s Role Binding in %s namespace", found.Name, projectName)
+	// 		}
+	// 	}
+	// }
 
 	//Success
 	return reconcile.Result{}, nil
